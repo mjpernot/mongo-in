@@ -1,0 +1,11 @@
+*.pyc
+.scannerwork
+.coverage
+*.swp
+*.HOLD
+coverage.xml
+config/*.py
+config/*.cfg
+lib
+mongo_lib
+.scannerwork
