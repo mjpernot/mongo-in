@@ -22,114 +22,106 @@ exit 2
    Program:  mongo_in.py
 
     Description:  Program to take an external JSON document (file) and insert
-        or import into a Mongo database.
+        into a Mongo database.
 
     Usage:
-        mongo_in.py -c cfg_file -d path
-            {-I -b db_name -t coll_name -a name -f {path/file | path/file*} |
-             -M -b db_name -t coll_name -a name -f {path/file | path/file*} |
-             [-p path}
-            [-v | -h]
+        mongo_in.py -c cfg_file -d path -I [-v | -h]
 
     Arguments:
-        -c cfg_file => Mongo configuration file.  Required arg.
-        -d dir path => Config directory path.  Required arg.
+        -c cfg_file => Mongo configuration file.
+        -d dir path => Config directory path.
+        -I => Insert file with JSON documents into database.
 
-        -I => Insert JSON document into database.
-            -b db_name => Database Name.
-            -t coll_name => Collection Name.
-            -f file(s) => JSON document to be inserted.  Requires absolute
-                path.
-            -a name => Authentication Database Name.  Required for accounts
-                not in database (-b option).
-
-        -M => Import JSON file into database.
-            -b db_name => Database Name.
-            -t coll_name => Collection Name.
-            -f file(s) => JSON document to be inserted.  Requires absolute
-                path.
-            -a name => Authentication Database Name.  Required for accounts
-                not in database (-b option).
-
-        -p => Path to Mongo binaries.  Only required if the user
-            running the program does not have the Mongo binaries in their path.
         -v => Display version of this program.
         -h => Help and usage message.
 
         NOTE 1:  -v and/or -h overrides all other options.
-        NOTE 2:  -I and -M are XOR options.
 
     Notes:
         Mongo configuration file format (config/mongo.py.TEMPLATE).  The
             configuration file format is for connecting to a Mongo database or
-            replica set for monitoring.  A second configuration file can also
-            be used to connect to a Mongo database or replica set to insert the
-            results of the performance monitoring into.
+            replica set.
 
-            There are two ways to connect methods:  single Mongo database or a
-            Mongo replica set.
+        # Name of Mongo database for data insertion
+        dbs = "DATABASE"
+        # Name of Mongo collection
+        tbl = "COLLECTION"
+        # Logger directory for the storage of logs.
+        log_dir = "BASE_PATH/log/"
+        # Logger file name.
+        log_file = "mongo_in.log"
+        # Directory path to where error files are saved to.
+        error_dir = "BASE_PATH/insert_error"
+        # Directory where to monitor for new files to insert into Mongodb.
+        monitor_dir = "MONITOR_DIR_PATH"
+        # Regular expression for search for Insert/Mongodb file names.
+        file_regex = "_mongo.json"
+        # Directory path to where Mongo inserted files are saved to.
+        archive_dir = "BASE_PATH/archive"
 
-            Single database connection:
+        There are two ways to connect methods:  single Mongo database or a
+        Mongo replica set.
 
-            # Single Configuration file for Mongo Database Server.
-            user = "USER"
-            japd = "PSWORD"
-            host = "IP_ADDRESS"
-            name = "HOSTNAME"
-            port = 27017
-            conf_file = None
-            auth = True
-            auth_db = "admin"
-            auth_mech = "SCRAM-SHA-1"
+        Single database connection:
 
-            Replica Set connection:  Same format as above, but with these
-                additional entries at the end of the configuration file.  By
-                default all these entries are set to None to represent not
-                connecting to a replica set.
+        # Single Configuration file for Mongo Database Server.
+        user = "USER"
+        japd = "PSWORD"
+        host = "IP_ADDRESS"
+        name = "HOSTNAME"
+        port = 27017
+        conf_file = None
+        auth = True
+        auth_db = "admin"
+        auth_mech = "SCRAM-SHA-1"
 
-            repset = "REPLICA_SET_NAME"
-            repset_hosts = "HOST1:PORT, HOST2:PORT, HOST3:PORT, [...]"
-            db_auth = "AUTHENTICATION_DATABASE"
+        Replica Set connection:  Same format as above, but with these
+            additional entries at the end of the configuration file.  By
+            default all these entries are set to None to represent not
+            connecting to a replica set.
 
-            If Mongo is set to use TLS or SSL connections, then one or more of
-                the following entries will need to be completed to connect
-                using TLS or SSL protocols.
-                Note:  Read the configuration file to determine which entries
-                    will need to be set.
+        repset = "REPLICA_SET_NAME"
+        repset_hosts = "HOST1:PORT, HOST2:PORT, HOST3:PORT, [...]"
+        db_auth = "AUTHENTICATION_DATABASE"
 
-                SSL:
-                    auth_type = None
-                    ssl_client_ca = None
-                    ssl_client_key = None
-                    ssl_client_cert = None
-                    ssl_client_phrase = None
-                TLS:
-                    auth_type = None
-                    tls_ca_certs = None
-                    tls_certkey = None
-                    tls_certkey_phrase = None
+        If Mongo is set to use TLS or SSL connections, then one or more of
+            the following entries will need to be completed to connect
+            using TLS or SSL protocols.
+            Note:  Read the configuration file to determine which entries
+                will need to be set.
 
-            Note:  FIPS Environment for Mongo.
-              If operating in a FIPS 104-2 environment, this package will
-              require at least a minimum of pymongo==3.8.0 or better.  It will
-              also require a manual change to the auth.py module in the pymongo
-              package.  See below for changes to auth.py.
+            SSL:
+                auth_type = None
+                ssl_client_ca = None
+                ssl_client_key = None
+                ssl_client_cert = None
+                ssl_client_phrase = None
+            TLS:
+                auth_type = None
+                tls_ca_certs = None
+                tls_certkey = None
+                tls_certkey_phrase = None
 
-            - Locate the auth.py file python installed packages on the system
-                in the pymongo package directory.
-            - Edit the file and locate the "_password_digest" function.
-            - In the "_password_digest" function there is an line that should
-                match: "md5hash = hashlib.md5()".  Change it to
-                "md5hash = hashlib.md5(usedforsecurity=False)".
-            - Lastly, it will require the Mongo configuration file entry
-                auth_mech to be set to: SCRAM-SHA-1 or SCRAM-SHA-256.
+        Note:  FIPS Environment for Mongo.
+          If operating in a FIPS 104-2 environment, this package will
+          require at least a minimum of pymongo==3.8.0 or better.  It will
+          also require a manual change to the auth.py module in the pymongo
+          package.  See below for changes to auth.py.
+
+        - Locate the auth.py file python installed packages on the system
+            in the pymongo package directory.
+        - Edit the file and locate the "_password_digest" function.
+        - In the "_password_digest" function there is an line that should
+            match: "md5hash = hashlib.md5()".  Change it to
+            "md5hash = hashlib.md5(usedforsecurity=False)".
+        - Lastly, it will require the Mongo configuration file entry
+            auth_mech to be set to: SCRAM-SHA-1 or SCRAM-SHA-256.
 
         Configuration modules -> Name is runtime dependent as it can be used to
             connect to different databases with different names.
 
     Example:
-        mongo_in.py -c mongo -d config -b GMI -t FAC -f /tmp/ins_doc -M
-        mongo_in.py -c mongo -d config -b GMI -t FAC -f /tmp/ins_doc -I
+        mongo_in.py -c mongo -d config -I
 
 ":"""
 # Python program follows
@@ -139,6 +131,7 @@ exit 2
 
 # Standard
 import sys
+import os
 
 # Local
 try:
@@ -174,7 +167,80 @@ def help_message():
     print(__doc__)
 
 
-def insert_data(args, **kwargs):
+def insert_mongo(args, cfg, dtg, log, data):
+
+    """Function:  insert_mongo
+
+    Description:  Insert JSON document into Mongo database.
+
+    Arguments:
+        (input) args -> ArgParser class instance
+        (input) cfg -> Configuration setup
+        (input) dtg -> Datatime class instance
+        (input) log -> Log class instance
+        (input) line_json -> JSON document
+        (output) status -> True|False - Successful insertion into Mongo
+
+    """
+
+    status = True
+    m_stat = mongo_libs.ins_doc(cfg, cfg.dbs, cfg.tbl, line_json)
+
+    if not m_stat[0]:
+        log.log_err("insert_mongo:  Insertion into Mongo failed.")
+        log.log_err(f"Mongo error message:  {mongo_stat[1]}")
+        fname = os.path.join(
+            cfg.error_dir, "mongo_insert_failed." + dtg.get_hack("ymd"))
+        gen_libs.write_file(fname=fname, mode="a", data=line_json)
+        status = False
+
+    return status
+
+
+def process_insert(args, cfg, dtg, log, fname):
+
+    """Function:  process_insert
+
+    Description:  Process the insert file and send to a database.
+
+    Arguments:
+        (input) args -> ArgParser class instance
+        (input) cfg -> Configuration setup
+        (input) dtg -> Datatime class instance
+        (input) log -> Log class instance
+        (input) fname -> Insert file name
+        (output) status -> True|False - File has successfully processed
+
+    """
+
+    log.log_info("process_insert:  Converting data to JSON.")
+    status = True
+
+    with open(fname, mode="r", encoding="UTF-8") as fhdr:
+        data = fhdr.read()
+
+    # Check the first 70 chars in case the encoded is split into multiple lines
+    if is_base64(data):
+        line_json = ast.literal_eval(base64.b64decode(data).decode())
+
+    else:
+        try:
+            line_json = json.loads(data)
+
+        except ValueError:
+            line_json = data
+
+    if isinstance(line_json, dict):
+        status = status & insert_mongo(args, cfg, dtg, log, line_json)
+
+    else:
+        log.log_err("process_insert: Data failed to convert to JSON.")
+        status = False
+
+    return status
+
+
+def insert_data(args, cfg, dtg, log):
 
     """Function:  insert_data
 
@@ -182,27 +248,61 @@ def insert_data(args, **kwargs):
 
     Arguments:
         (input) args -> ArgParser class instance
-        (input) kwargs:
-            opt_arg -> Contains list of optional arguments for command line
-            opt_rep -> Contains list of replaceable arguments for command line
+        (input) cfg -> Configuration setup
+        (input) dtg -> Datatime class instance
+        (input) log -> Log class instance
 
     """
 
-    # Process files
-    for fname in args.get_val("-f"):
+    log.log_info("insert_data:  Searching for new files.")
+    insert_list = gen_libs.filename_search(
+        cfg.monitor_dir, cfg.file_regex, add_path=True)
 
-        with open(fname, mode="r", encoding="UTF-8") as fhdlr:
-            data = fhdlr.readline()
-
-            if not isinstance(data, dict):
-### Try to convert it here or exit?
-
-            state, msg = mongo_libs.ins_doc(
-                mongo, args.get_val("-b"), args.get_val("-t"), data)
-STOPPED HERE
+    log.log_info("insert_data:  Processing files to insert.")
+    for fname in insert_list:
+        log.log_info(f"insert_data:  Processing file: {fname}")
+        status = process_insert(args, cfg, dtg, log, fname)
+        log.log_info("insert_data:  Post-processing of files.")
+        gen_libs.mv_file(fname, SOURCE_DIR, DESTINATION_DIR)
+### STOPPED HERE
 
 
-def run_program(args, func_dict, **kwargs):
+def checks_dirs(args, cfg):
+
+    """Function:  checks_dirs
+
+    Description:  Validate the directories in the configuration file.
+
+    Arguments:
+        (input) args -> ArgParser class instance
+        (input) cfg -> Configuration setup
+        (output) msg_dict -> Dictionary of any error messages detected
+
+    """
+
+    msg_dict = dict()
+    status, msg = gen_libs.chk_crt_dir(
+        cfg.error_dir, write=True, create=True, no_print=True)
+
+    if not status:
+        msg_dict[cfg.error_dir] = msg
+
+    status, msg = gen_libs.chk_crt_dir(
+        cfg.archive_dir, write=True, create=True, no_print=True)
+
+    if not status:
+        msg_dict[cfg.archive_dir] = msg
+
+    status, msg = gen_libs.chk_crt_dir(
+        cfg.monitor_dir, write=True, no_print=True)
+
+    if not status:
+        msg_dict[cfg.monitor_dir] = msg
+
+    return msg_dict
+    
+
+def run_program(args, func_dict):
 
     """Function:  run_program
 
@@ -211,18 +311,37 @@ def run_program(args, func_dict, **kwargs):
     Arguments:
         (input) args -> ArgParser class instance
         (input) func_dict -> Dictionary list of functions and options
-        (input) kwargs:
-            opt_arg -> Contains list of optional arguments for command line
-            opt_rep -> Contains list of replaceable arguments for command line
 
     """
 
     func_dict = dict(func_dict)
+    dtg = gen_class.TimeFormat()
+    dtg.create_hack("ymd")
+    cfg = gen_libs.load_module(args.get_val("-c"), args.get_val("-d"))
+    status, err_msg = gen_libs.chk_crt_dir(
+        cfg.log_dir, write=True, create=True, no_print=True)
+    log_file = os.path.join(
+        cfg.log_dir, cfg.log_file + "." + dtg.get_hack("ymd"))
 
-    # Intersect args_array & func_dict to determine which functions to call
-    for func in set(args.get_args_keys()) & set(func_dict.keys()):
-### Need a status return???
-        status = func_dict[func](args, **kwargs)
+    if status:
+        log = gen_class.Logger(
+            log_file, log_file, "INFO",
+            "%(asctime)s %(levelname)s %(message)s", "%Y-%m-%dT%H:%M:%SZ")
+        log.log_info("Program initialization.")
+        msg_dict = checks_dirs(args, cfg)
+
+        if msg_dict:
+            log.log_err("Validation of configuration directories failed")
+            log.log_err(f"Message: {msg_dict}")
+
+        else:
+            # Intersect args_array & func_dict to determine function calls
+            for func in set(args.get_args_keys()) & set(func_dict.keys()):
+                func_dict[func](args, cfg, dtg, log)
+
+    else:
+        print("Error: Logger Directory Check Failure")
+        print(f"Error Message: {err_msg}")
 
 
 def main():
@@ -234,48 +353,33 @@ def main():
 
     Variables:
         dir_perms_chk -> contains directories and their octal permissions
-        file_perm_chk -> file check options with their perms in octal
         func_dict -> dictionary list for the function calls or other options
-        opt_arg_list-> contains list of optional arguments for command line
-        opt_arg_rep -> contains list of replaceable arguments for command line
         opt_multi_list -> contains the options that will have multiple values
         opt_req_list -> contains the options that are required for the program
         opt_val_list -> contains options which require values
-        opt_xor_dict -> contains options which are XOR with its values
 
     Arguments:
         (input) argv -> Arguments from the command line
 
     """
 
-    dir_perms_chk = {"-d": 5, "-p": 5}
-    file_perm_chk = {"-f": 6}
-    func_dict = {"-I": insert_data, "-M": import_data}
-    opt_arg_list = {
-        "-a": "--authenticationDatabase=", "-b": "--db=",
-        "-t": "--collection="}
-    opt_arg_rep = {"-f": "--file="}
-    opt_multi_list = ["-f"]
-    opt_req_list = ["-b", "-c", "-d", "-t", "-f"]
-    opt_val_list = ["-a", "-b", "-c", "-d", "-f", "-p", "-t"]
-    opt_xor_dict = {"-I": ["-M"], "-M": ["-I"]}
+    dir_perms_chk = {"-d": 5, "-I": 7}
+    func_dict = {"-I": insert_data}
+    opt_req_list = ["-c", "-d", "-I"]
+    opt_val_list = ["-c", "-d", "-I"]
 
     # Process argument list from command line
-    args = gen_class.ArgParser(
-        sys.argv, opt_val=opt_val_list, multi_val=opt_multi_list)
+    args = gen_class.ArgParser(sys.argv, opt_val=opt_val_list)
 
     if args.arg_parse2()                                            \
        and not gen_libs.help_func(args, __version__, help_message)  \
        and args.arg_require(opt_req=opt_req_list)                   \
-       and args.arg_dir_chk(dir_perms_chk=dir_perms_chk)            \
-       and args.arg_xor_dict(opt_xor_val=opt_xor_dict)              \
-       and args.arg_file_chk(file_perm_chk=file_perm_chk):
+       and args.arg_dir_chk(dir_perms_chk=dir_perms_chk):
 
         try:
             proglock = gen_class.ProgramLock(
                 sys.argv, args.get_val("-y", def_val=""))
-            run_program(
-                args, func_dict, opt_arg=opt_arg_list, opt_rep=opt_arg_rep)
+            run_program(args, func_dict)
             del proglock
 
         except gen_class.SingleInstanceException:
