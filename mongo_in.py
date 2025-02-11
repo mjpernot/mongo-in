@@ -401,8 +401,8 @@ def main():
 
     dir_perms_chk = {"-d": 5, "-I": 7}
     func_dict = {"-I": insert_data}
-    opt_req_list = ["-c", "-d", "-I"]
-    opt_val_list = ["-c", "-d", "-I"]
+    opt_req_list = ["-c", "-d"]
+    opt_val_list = ["-c", "-d"]
 
     # Process argument list from command line
     args = gen_class.ArgParser(sys.argv, opt_val=opt_val_list)
