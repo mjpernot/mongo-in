@@ -373,7 +373,7 @@ def run_program(args, func_dict):
         else:
             # Intersect args_array & func_dict to determine function calls
             for func in set(args.get_args_keys()) & set(func_dict.keys()):
-                func_dict[func](args, cfg, dtg, log)
+                func_dict[func](cfg, dtg, log)
 
     else:
         print("Error: Logger Directory Check Failure")
