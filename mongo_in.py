@@ -184,9 +184,9 @@ def insert_mongo(args, cfg, dtg, log, data):
     """
 
     status = True
-    m_stat = mongo_libs.ins_doc(cfg, cfg.dbs, cfg.tbl, line_json)
+    m_status = mongo_libs.ins_doc(cfg, cfg.dbs, cfg.tbl, line_json)
 
-    if not m_stat[0]:
+    if not m_status[0]:
         log.log_err("insert_mongo:  Insertion into Mongo failed.")
         log.log_err(f"Mongo error message:  {mongo_stat[1]}")
         fname = os.path.join(
@@ -214,7 +214,6 @@ def process_insert(args, cfg, dtg, log, fname):
     """
 
     log.log_info("process_insert:  Converting data to JSON.")
-    status = True
 
     with open(fname, mode="r", encoding="UTF-8") as fhdr:
         data = fhdr.read()
@@ -231,7 +230,7 @@ def process_insert(args, cfg, dtg, log, fname):
             line_json = data
 
     if isinstance(line_json, dict):
-        status = status & insert_mongo(args, cfg, dtg, log, line_json)
+        status = insert_mongo(args, cfg, dtg, log, line_json)
 
     else:
         log.log_err("process_insert: Data failed to convert to JSON.")
@@ -255,16 +254,19 @@ def insert_data(args, cfg, dtg, log):
     """
 
     log.log_info("insert_data:  Searching for new files.")
+    status = True
     insert_list = gen_libs.filename_search(
         cfg.monitor_dir, cfg.file_regex, add_path=True)
 
     log.log_info("insert_data:  Processing files to insert.")
     for fname in insert_list:
         log.log_info(f"insert_data:  Processing file: {fname}")
-        status = process_insert(args, cfg, dtg, log, fname)
+        status = status & process_insert(args, cfg, dtg, log, fname)
         log.log_info("insert_data:  Post-processing of files.")
-        gen_libs.mv_file(fname, SOURCE_DIR, DESTINATION_DIR)
-### STOPPED HERE
+        gen_libs.mv_file(fname, cfg.monitor_dir, cfg.archive_dir)
+
+    if not status and cfg.to_addr:
+        mail = gen_class.setup_mail(cfg.to_addr, subj=cfg.subj)
 
 
 def checks_dirs(args, cfg):
