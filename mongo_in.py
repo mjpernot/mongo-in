@@ -303,14 +303,13 @@ def insert_data(cfg, dtg, log):
         mail.send_mail()
 
 
-def check_dirs(args, cfg):
+def check_dirs(cfg):
 
     """Function:  check_dirs
 
     Description:  Validate the directories in the configuration file.
 
     Arguments:
-        (input) args -> ArgParser class instance
         (input) cfg -> Configuration setup
         (output) msg_dict -> Dictionary of any error messages detected
 
