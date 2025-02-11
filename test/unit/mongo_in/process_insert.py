@@ -51,11 +51,11 @@ class Cfg():                                            # pylint:disable=R0903
         self.mconfig = "mongo"
 
 
-class Dtg():                                            # pylint:disable=R0903
+class TimeFormat():                                     # pylint:disable=R0903
 
-    """Class:  Dtg
+    """Class:  TimeFormat
 
-    Description:  Class which is a representation of a Dtg module.
+    Description:  Class which is a representation of a TimeFormat module.
 
     Methods:
         __init__
@@ -66,7 +66,7 @@ class Dtg():                                            # pylint:disable=R0903
 
         """Method:  __init__
 
-        Description:  Initialization instance of the Dtg class.
+        Description:  Initialization instance of the TimeFormat class.
 
         Arguments:
 
@@ -158,7 +158,7 @@ class UnitTest(unittest.TestCase):
         """
 
         self.cfg = Cfg()
-        self.dtg = Dtg()
+        self.dtg = TimeFormat()
         self.logger = Logger("Name", "Name", "INFO", "%(asctime)s%(message)s",
                              "%m-%d-%YT%H:%M:%SZ|")
         base = os.getcwd()
