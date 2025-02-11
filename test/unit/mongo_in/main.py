@@ -2,10 +2,10 @@
 
 """Program:  main.py
 
-    Description:  Unit testing of main in pulled_search.py.
+    Description:  Unit testing of main in mongo_in.py.
 
     Usage:
-        test/unit/pulled_search/main.py
+        test/unit/mongo_in/main.py
 
     Arguments:
 
@@ -21,14 +21,14 @@ import mock
 
 # Local
 sys.path.append(os.getcwd())
-import pulled_search
-import lib.gen_libs as gen_libs
-import version
+import mongo_in                                 # pylint:disable=E0401,C0413
+import lib.gen_libs as gen_libs             # pylint:disable=E0401,C0413,R0402
+import version                                  # pylint:disable=E0401,C0413
 
 __version__ = version.__version__
 
 
-class ArgParser(object):
+class ArgParser():
 
     """Class:  ArgParser
 
@@ -192,7 +192,7 @@ class ArgParser(object):
         return self.argparse2
 
 
-class ProgramLock(object):
+class ProgramLock():                                    # pylint:disable=R0903
 
     """Class:  ProgramLock
 
@@ -231,14 +231,8 @@ class UnitTest(unittest.TestCase):
         test_help_false
         test_require_false
         test_require_true
-        test_con_req_or_false
-        test_con_req_or_true
         test_dir_chk_crt_false
         test_dir_chk_crt_true
-        test_xor_dict_false
-        test_xor_dict_true
-        test_arg_file_chk_false
-        test_arg_file_chk_true
         test_run_program
         test_programlock_true
         test_programlock_false
@@ -265,7 +259,7 @@ class UnitTest(unittest.TestCase):
             "-y": "Flavor"}
         self.proglock = ProgramLock(["cmdline"], "FlavorID")
 
-    @mock.patch("pulled_search.gen_class.ArgParser")
+    @mock.patch("mongo_in.gen_class.ArgParser")
     def test_arg_parse2_false(self, mock_arg):
 
         """Function:  test_arg_parse2_false
@@ -280,10 +274,10 @@ class UnitTest(unittest.TestCase):
 
         mock_arg.return_value = self.args
 
-        self.assertFalse(pulled_search.main())
+        self.assertFalse(mongo_in.main())
 
-    @mock.patch("pulled_search.gen_libs.help_func")
-    @mock.patch("pulled_search.gen_class.ArgParser")
+    @mock.patch("mongo_in.gen_libs.help_func")
+    @mock.patch("mongo_in.gen_class.ArgParser")
     def test_arg_parse2_true(self, mock_arg, mock_help):
 
         """Function:  test_arg_parse2_true
@@ -297,10 +291,10 @@ class UnitTest(unittest.TestCase):
         mock_arg.return_value = self.args
         mock_help.return_value = True
 
-        self.assertFalse(pulled_search.main())
+        self.assertFalse(mongo_in.main())
 
-    @mock.patch("pulled_search.gen_libs.help_func")
-    @mock.patch("pulled_search.gen_class.ArgParser")
+    @mock.patch("mongo_in.gen_libs.help_func")
+    @mock.patch("mongo_in.gen_class.ArgParser")
     def test_help_true(self, mock_arg, mock_help):
 
         """Function:  test_help_true
@@ -314,10 +308,10 @@ class UnitTest(unittest.TestCase):
         mock_arg.return_value = self.args
         mock_help.return_value = True
 
-        self.assertFalse(pulled_search.main())
+        self.assertFalse(mongo_in.main())
 
-    @mock.patch("pulled_search.gen_libs.help_func")
-    @mock.patch("pulled_search.gen_class.ArgParser")
+    @mock.patch("mongo_in.gen_libs.help_func")
+    @mock.patch("mongo_in.gen_class.ArgParser")
     def test_help_false(self, mock_arg, mock_help):
 
         """Function:  test_help_false
@@ -334,10 +328,10 @@ class UnitTest(unittest.TestCase):
         mock_help.return_value = False
         mock_arg.arg_require.return_value = True
 
-        self.assertFalse(pulled_search.main())
+        self.assertFalse(mongo_in.main())
 
-    @mock.patch("pulled_search.gen_libs.help_func")
-    @mock.patch("pulled_search.gen_class.ArgParser")
+    @mock.patch("mongo_in.gen_libs.help_func")
+    @mock.patch("mongo_in.gen_class.ArgParser")
     def test_require_false(self, mock_arg, mock_help):
 
         """Function:  test_require_false
@@ -353,10 +347,10 @@ class UnitTest(unittest.TestCase):
         mock_arg.return_value = self.args
         mock_help.return_value = False
 
-        self.assertFalse(pulled_search.main())
+        self.assertFalse(mongo_in.main())
 
-    @mock.patch("pulled_search.gen_libs.help_func")
-    @mock.patch("pulled_search.gen_class.ArgParser")
+    @mock.patch("mongo_in.gen_libs.help_func")
+    @mock.patch("mongo_in.gen_class.ArgParser")
     def test_require_true(self, mock_arg, mock_help):
 
         """Function:  test_require_true
@@ -367,53 +361,15 @@ class UnitTest(unittest.TestCase):
 
         """
 
-        self.args.opt_con_or2 = False
-
-        mock_arg.return_value = self.args
-        mock_help.return_value = False
-
-        self.assertFalse(pulled_search.main())
-
-    @mock.patch("pulled_search.gen_libs.help_func")
-    @mock.patch("pulled_search.gen_class.ArgParser")
-    def test_con_req_or_false(self, mock_arg, mock_help):
-
-        """Function:  test_con_req_or_false
-
-        Description:  Test with arg_cond_req_or returns False.
-
-        Arguments:
-
-        """
-
-        self.args.opt_con_or2 = False
-
-        mock_arg.return_value = self.args
-        mock_help.return_value = False
-
-        self.assertFalse(pulled_search.main())
-
-    @mock.patch("pulled_search.gen_libs.help_func")
-    @mock.patch("pulled_search.gen_class.ArgParser")
-    def test_con_req_or_true(self, mock_arg, mock_help):
-
-        """Function:  test_con_req_or_true
-
-        Description:  Test with arg_cond_req_or returns True.
-
-        Arguments:
-
-        """
-
         self.args.dir_perms_chk2 = False
 
         mock_arg.return_value = self.args
         mock_help.return_value = False
 
-        self.assertFalse(pulled_search.main())
+        self.assertFalse(mongo_in.main())
 
-    @mock.patch("pulled_search.gen_libs.help_func")
-    @mock.patch("pulled_search.gen_class.ArgParser")
+    @mock.patch("mongo_in.gen_libs.help_func")
+    @mock.patch("mongo_in.gen_class.ArgParser")
     def test_dir_chk_crt_false(self, mock_arg, mock_help):
 
         """Function:  test_dir_chk_crt_false
@@ -429,11 +385,13 @@ class UnitTest(unittest.TestCase):
         mock_arg.return_value = self.args
         mock_help.return_value = False
 
-        self.assertFalse(pulled_search.main())
+        self.assertFalse(mongo_in.main())
 
-    @mock.patch("pulled_search.gen_libs.help_func")
-    @mock.patch("pulled_search.gen_class.ArgParser")
-    def test_dir_chk_crt_true(self, mock_arg, mock_help):
+    @mock.patch("mongo_in.run_program", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.gen_class.ProgramLock")
+    @mock.patch("mongo_in.gen_libs.help_func")
+    @mock.patch("mongo_in.gen_class.ArgParser")
+    def test_dir_chk_crt_true(self, mock_arg, mock_help, mock_lock):
 
         """Function:  test_dir_chk_crt_true
 
@@ -443,94 +401,16 @@ class UnitTest(unittest.TestCase):
 
         """
 
-        self.args.opt_xor_val2 = False
-
-        mock_arg.return_value = self.args
-        mock_help.return_value = False
-
-        self.assertFalse(pulled_search.main())
-
-    @mock.patch("pulled_search.gen_libs.help_func")
-    @mock.patch("pulled_search.gen_class.ArgParser")
-    def test_xor_dict_false(self, mock_arg, mock_help):
-
-        """Function:  test_xor_dict_false
-
-        Description:  Test with arg_xor_dict returns False.
-
-        Arguments:
-
-        """
-
-        self.args.opt_xor_val2 = False
-
-        mock_arg.return_value = self.args
-        mock_help.return_value = False
-
-        self.assertFalse(pulled_search.main())
-
-    @mock.patch("pulled_search.gen_libs.help_func")
-    @mock.patch("pulled_search.gen_class.ArgParser")
-    def test_xor_dict_true(self, mock_arg, mock_help):
-
-        """Function:  test_xor_dict_true
-
-        Description:  Test with arg_xor_dict returns True.
-
-        Arguments:
-
-        """
-
-        self.args.file_perm_chk2 = False
-
-        mock_arg.return_value = self.args
-        mock_help.return_value = False
-
-        self.assertFalse(pulled_search.main())
-
-    @mock.patch("pulled_search.gen_libs.help_func")
-    @mock.patch("pulled_search.gen_class.ArgParser")
-    def test_arg_file_chk_false(self, mock_arg, mock_help):
-
-        """Function:  test_arg_file_chk_false
-
-        Description:  Test with arg_file_chk returns False.
-
-        Arguments:
-
-        """
-
-        self.args.file_perm_chk2 = False
-
-        mock_arg.return_value = self.args
-        mock_help.return_value = False
-
-        self.assertFalse(pulled_search.main())
-
-    @mock.patch("pulled_search.run_program", mock.Mock(return_value=True))
-    @mock.patch("pulled_search.gen_class.ProgramLock")
-    @mock.patch("pulled_search.gen_libs.help_func")
-    @mock.patch("pulled_search.gen_class.ArgParser")
-    def test_arg_file_chk_true(self, mock_arg, mock_help, mock_lock):
-
-        """Function:  test_arg_file_chk_true
-
-        Description:  Test with arg_file_chk returns True.
-
-        Arguments:
-
-        """
-
         mock_lock.return_value = self.proglock
         mock_arg.return_value = self.args
         mock_help.return_value = False
 
-        self.assertFalse(pulled_search.main())
+        self.assertFalse(mongo_in.main())
 
-    @mock.patch("pulled_search.run_program", mock.Mock(return_value=True))
-    @mock.patch("pulled_search.gen_class.ProgramLock")
-    @mock.patch("pulled_search.gen_libs.help_func")
-    @mock.patch("pulled_search.gen_class.ArgParser")
+    @mock.patch("mongo_in.run_program", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.gen_class.ProgramLock")
+    @mock.patch("mongo_in.gen_libs.help_func")
+    @mock.patch("mongo_in.gen_class.ArgParser")
     def test_run_program(self, mock_arg, mock_help, mock_lock):
 
         """Function:  test_run_program
@@ -545,12 +425,12 @@ class UnitTest(unittest.TestCase):
         mock_arg.return_value = self.args
         mock_help.return_value = False
 
-        self.assertFalse(pulled_search.main())
+        self.assertFalse(mongo_in.main())
 
-    @mock.patch("pulled_search.run_program", mock.Mock(return_value=True))
-    @mock.patch("pulled_search.gen_class.ProgramLock")
-    @mock.patch("pulled_search.gen_libs.help_func")
-    @mock.patch("pulled_search.gen_class.ArgParser")
+    @mock.patch("mongo_in.run_program", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.gen_class.ProgramLock")
+    @mock.patch("mongo_in.gen_libs.help_func")
+    @mock.patch("mongo_in.gen_class.ArgParser")
     def test_programlock_true(self, mock_arg, mock_help, mock_lock):
 
         """Function:  test_programlock_true
@@ -565,11 +445,11 @@ class UnitTest(unittest.TestCase):
         mock_arg.return_value = self.args
         mock_help.return_value = False
 
-        self.assertFalse(pulled_search.main())
+        self.assertFalse(mongo_in.main())
 
-    @mock.patch("pulled_search.gen_class.ProgramLock")
-    @mock.patch("pulled_search.gen_libs.help_func")
-    @mock.patch("pulled_search.gen_class.ArgParser")
+    @mock.patch("mongo_in.gen_class.ProgramLock")
+    @mock.patch("mongo_in.gen_libs.help_func")
+    @mock.patch("mongo_in.gen_class.ArgParser")
     def test_programlock_false(self, mock_arg, mock_help, mock_lock):
 
         """Function:  test_programlock_false
@@ -581,17 +461,17 @@ class UnitTest(unittest.TestCase):
         """
 
         mock_lock.side_effect = \
-            pulled_search.gen_class.SingleInstanceException
+            mongo_in.gen_class.SingleInstanceException
         mock_arg.return_value = self.args
         mock_help.return_value = False
 
         with gen_libs.no_std_out():
-            self.assertFalse(pulled_search.main())
+            self.assertFalse(mongo_in.main())
 
-    @mock.patch("pulled_search.run_program", mock.Mock(return_value=True))
-    @mock.patch("pulled_search.gen_class.ProgramLock")
-    @mock.patch("pulled_search.gen_libs.help_func")
-    @mock.patch("pulled_search.gen_class.ArgParser")
+    @mock.patch("mongo_in.run_program", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.gen_class.ProgramLock")
+    @mock.patch("mongo_in.gen_libs.help_func")
+    @mock.patch("mongo_in.gen_class.ArgParser")
     def test_programlock_id(self, mock_arg, mock_help, mock_lock):
 
         """Function:  test_programlock_id
@@ -606,7 +486,7 @@ class UnitTest(unittest.TestCase):
         mock_arg.return_value = self.args2
         mock_help.return_value = False
 
-        self.assertFalse(pulled_search.main())
+        self.assertFalse(mongo_in.main())
 
 
 if __name__ == "__main__":
