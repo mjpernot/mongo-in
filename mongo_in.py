@@ -183,6 +183,7 @@ def insert_mongo(args, cfg, dtg, log, data):
 
     """
 
+    log.log_info("insert_mongo:  Inserting data into Mongo.")
     status = True
     m_status = mongo_libs.ins_doc(cfg, cfg.dbs, cfg.tbl, line_json)
 
@@ -269,9 +270,9 @@ def insert_data(args, cfg, dtg, log):
         mail = gen_class.setup_mail(cfg.to_addr, subj=cfg.subj)
 
 
-def checks_dirs(args, cfg):
+def check_dirs(args, cfg):
 
-    """Function:  checks_dirs
+    """Function:  check_dirs
 
     Description:  Validate the directories in the configuration file.
 
@@ -330,7 +331,7 @@ def run_program(args, func_dict):
             log_file, log_file, "INFO",
             "%(asctime)s %(levelname)s %(message)s", "%Y-%m-%dT%H:%M:%SZ")
         log.log_info("Program initialization.")
-        msg_dict = checks_dirs(args, cfg)
+        msg_dict = check_dirs(args, cfg)
 
         if msg_dict:
             log.log_err("Validation of configuration directories failed")
