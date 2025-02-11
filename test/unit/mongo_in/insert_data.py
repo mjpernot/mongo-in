@@ -2,10 +2,10 @@
 
 """Program:  insert_data.py
 
-    Description:  Unit testing of insert_data in pulled_search.py.
+    Description:  Unit testing of insert_data in mongo_in.py.
 
     Usage:
-        test/unit/pulled_search/insert_data.py
+        test/unit/mongo_in/insert_data.py
 
     Arguments:
 
@@ -21,21 +21,20 @@ import mock
 
 # Local
 sys.path.append(os.getcwd())
-import pulled_search
+import mongo_in
 import version
 
 __version__ = version.__version__
 
 
-class ArgParser(object):
+class TimeFormat():                                     # pylint:disable=R0903
 
-    """Class:  ArgParser
+    """Class:  TimeFormat
 
-    Description:  Class stub holder for gen_class.ArgParser class.
+    Description:  Class stub holder for gen_class.TimeFormat class.
 
     Methods:
         __init__
-        get_val
 
     """
 
@@ -49,25 +48,68 @@ class ArgParser(object):
 
         """
 
-        self.cmdline = None
-        self.args_array = dict()
+        self.delimit = "."
+        self.micro = False
+        self.thacks = {}
+        self.tformats = {
+            "ymd": {"format": "%Y%m%d", "del": "", "micro": False}}
 
-    def get_val(self, skey, def_val=None):
 
-        """Method:  get_val
+class Mail():
 
-        Description:  Method stub holder for gen_class.ArgParser.get_val.
+    """Class:  Mail
+
+    Description:  Class stub holder for gen_class.Mail class.
+
+    Methods:
+        __init__
+        add_2_msg
+        send_mail
+
+    """
+
+    def __init__(self):
+
+        """Method:  __init__
+
+        Description:  Class initialization.
 
         Arguments:
 
         """
 
-        return self.args_array.get(skey, def_val)
+        self.data = None
+
+    def add_2_msg(self, data):
+
+        """Method:  add_2_msg
+
+        Description:  Stub method holder for Mail.add_2_msg.
+
+        Arguments:
+
+        """
+
+        self.data = data
+
+        return True
+
+    def send_mail(self):
+
+        """Method:  send_mail
+
+        Description:  Stub method holder for Mail.send_mail.
+
+        Arguments:
+
+        """
+
+        return True
 
 
-class CfgTest(object):
+class Cfg():
 
-    """Class:  CfgTest
+    """Class:  Cfg
 
     Description:  Class which is a representation of a cfg module.
 
@@ -80,16 +122,47 @@ class CfgTest(object):
 
         """Method:  __init__
 
-        Description:  Initialization instance of the CfgTest class.
+        Description:  Initialization instance of the Cfg class.
 
         Arguments:
 
         """
 
-        self.mfile_regex = "*_insert.json"
+        self.file_regex = "*mongo.json"
         self.monitor_dir = "/dir_path/monitor_dir"
-        self.merror_dir = "/dir/path/error_dir"
-        self.marchive_dir = "/dir/path/archive_dir"
+        self.error_dir = "/dir/path/error_dir"
+        self.archive_dir = "/dir/path/archive_dir"
+        self.to_addr = "Address"
+        self.subj = "Subject"
+
+
+class Cfg2():
+
+    """Class:  Cfg2
+
+    Description:  Class which is a representation of a cfg module.
+
+    Methods:
+        __init__
+
+    """
+
+    def __init__(self):
+
+        """Method:  __init__
+
+        Description:  Initialization instance of the Cfg class.
+
+        Arguments:
+
+        """
+
+        self.file_regex = "*mongo.json"
+        self.monitor_dir = "/dir_path/monitor_dir"
+        self.error_dir = "/dir/path/error_dir"
+        self.archive_dir = "/dir/path/archive_dir"
+        self.to_addr = None
+        self.subj = None
 
 
 class UnitTest(unittest.TestCase):
@@ -104,7 +177,6 @@ class UnitTest(unittest.TestCase):
         test_with_multiple_files
         test_with_single_file
         test_with_no_files
-        test_with_preamble
         test_with_no_mail
         test_with_mail
 
@@ -120,20 +192,20 @@ class UnitTest(unittest.TestCase):
 
         """
 
-        self.args = ArgParser()
-        self.cfg = CfgTest()
-        self.args_array = {"-t": "name@domain"}
-        self.args_array2 = {"-t": "name@domain", "-s": "Pre-amble: "}
+        self.cfg = Cfg()
+        self.cfg2 = Cfg2()
+        self.mail = Mail()
+        self.dtg = TimeFormat()
         self.insert_list = list()
         self.insert_list2 = ["/path/file1"]
         self.insert_list3 = ["/path/file1", "/path/file2"]
 
-    @mock.patch("pulled_search.non_processed", mock.Mock(return_value=True))
-    @mock.patch("pulled_search.cleanup_files", mock.Mock(return_value=True))
-    @mock.patch("pulled_search.process_insert", mock.Mock(return_value=False))
-    @mock.patch("pulled_search.gen_libs.filename_search")
-    @mock.patch("pulled_search.gen_class.Logger")
-    def test_with_fail_insert(self, mock_log, mock_search):
+    @mock.patch("mongo_in.gen_libs.mv_file", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.process_insert", mock.Mock(return_value=False))
+    @mock.patch("mongo_in.gen_class.setup_mail")
+    @mock.patch("mongo_in.gen_libs.filename_search")
+    @mock.patch("mongo_in.gen_class.Logger")
+    def test_with_fail_insert(self, mock_log, mock_search, mock_mail):
 
         """Function:  test_with_fail_insert
 
@@ -145,15 +217,15 @@ class UnitTest(unittest.TestCase):
 
         mock_log.return_value = True
         mock_search.return_value = self.insert_list2
+        mock_mail.return_value = self.mail
 
         self.assertFalse(
-            pulled_search.insert_data(self.args, self.cfg, mock_log))
+            mongo_in.insert_data(self.cfg, self.dtg, mock_log))
 
-    @mock.patch("pulled_search.non_processed", mock.Mock(return_value=True))
-    @mock.patch("pulled_search.cleanup_files", mock.Mock(return_value=True))
-    @mock.patch("pulled_search.process_insert", mock.Mock(return_value=True))
-    @mock.patch("pulled_search.gen_libs.filename_search")
-    @mock.patch("pulled_search.gen_class.Logger")
+    @mock.patch("mongo_in.gen_libs.mv_file", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.process_insert", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.gen_libs.filename_search")
+    @mock.patch("mongo_in.gen_class.Logger")
     def test_with_multiple_files(self, mock_log, mock_search):
 
         """Function:  test_with_multiple_files
@@ -168,13 +240,12 @@ class UnitTest(unittest.TestCase):
         mock_search.return_value = self.insert_list3
 
         self.assertFalse(
-            pulled_search.insert_data(self.args, self.cfg, mock_log))
+            mongo_in.insert_data(self.cfg, self.dtg, mock_log))
 
-    @mock.patch("pulled_search.non_processed", mock.Mock(return_value=True))
-    @mock.patch("pulled_search.cleanup_files", mock.Mock(return_value=True))
-    @mock.patch("pulled_search.process_insert", mock.Mock(return_value=True))
-    @mock.patch("pulled_search.gen_libs.filename_search")
-    @mock.patch("pulled_search.gen_class.Logger")
+    @mock.patch("mongo_in.gen_libs.mv_file", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.process_insert", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.gen_libs.filename_search")
+    @mock.patch("mongo_in.gen_class.Logger")
     def test_with_single_file(self, mock_log, mock_search):
 
         """Function:  test_with_single_file
@@ -189,10 +260,10 @@ class UnitTest(unittest.TestCase):
         mock_search.return_value = self.insert_list2
 
         self.assertFalse(
-            pulled_search.insert_data(self.args, self.cfg, mock_log))
+            mongo_in.insert_data(self.cfg, self.dtg, mock_log))
 
-    @mock.patch("pulled_search.gen_libs.filename_search")
-    @mock.patch("pulled_search.gen_class.Logger")
+    @mock.patch("mongo_in.gen_libs.filename_search")
+    @mock.patch("mongo_in.gen_class.Logger")
     def test_with_no_files(self, mock_log, mock_search):
 
         """Function:  test_with_no_files
@@ -207,32 +278,11 @@ class UnitTest(unittest.TestCase):
         mock_search.return_value = self.insert_list
 
         self.assertFalse(
-            pulled_search.insert_data(self.args, self.cfg, mock_log))
+            mongo_in.insert_data(self.cfg, self.dtg, mock_log))
 
-    @mock.patch("pulled_search.gen_class.setup_mail",
-                mock.Mock(return_value=True))
-    @mock.patch("pulled_search.gen_libs.filename_search")
-    @mock.patch("pulled_search.gen_class.Logger")
-    def test_with_preamble(self, mock_log, mock_search):
-
-        """Function:  test_with_preamble
-
-        Description:  Test with pre-amble subject.
-
-        Arguments:
-
-        """
-
-        self.args.args_array = self.args_array2
-
-        mock_log.return_value = True
-        mock_search.return_value = self.insert_list
-
-        self.assertFalse(
-            pulled_search.insert_data(self.args, self.cfg, mock_log))
-
-    @mock.patch("pulled_search.gen_libs.filename_search")
-    @mock.patch("pulled_search.gen_class.Logger")
+    @mock.patch("mongo_in.gen_libs.mv_file", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.gen_libs.filename_search")
+    @mock.patch("mongo_in.gen_class.Logger")
     def test_with_no_mail(self, mock_log, mock_search):
 
         """Function:  test_with_no_mail
@@ -247,13 +297,14 @@ class UnitTest(unittest.TestCase):
         mock_search.return_value = self.insert_list
 
         self.assertFalse(
-            pulled_search.insert_data(self.args, self.cfg, mock_log))
+            mongo_in.insert_data(self.cfg2, self.dtg, mock_log))
 
-    @mock.patch("pulled_search.gen_class.setup_mail",
-                mock.Mock(return_value=True))
-    @mock.patch("pulled_search.gen_libs.filename_search")
-    @mock.patch("pulled_search.gen_class.Logger")
-    def test_with_mail(self, mock_log, mock_search):
+    @mock.patch("mongo_in.gen_libs.mv_file", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.gen_class.setup_mail", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.gen_class.setup_mail")
+    @mock.patch("mongo_in.gen_libs.filename_search")
+    @mock.patch("mongo_in.gen_class.Logger")
+    def test_with_mail(self, mock_log, mock_search, mock_mail):
 
         """Function:  test_with_mail
 
@@ -263,13 +314,12 @@ class UnitTest(unittest.TestCase):
 
         """
 
-        self.args.args_array = self.args_array
-
         mock_log.return_value = True
         mock_search.return_value = self.insert_list
+        mock_mail.return_value = self.mail
 
         self.assertFalse(
-            pulled_search.insert_data(self.args, self.cfg, mock_log))
+            mongo_in.insert_data(self.cfg, self.dtg, mock_log))
 
 
 if __name__ == "__main__":

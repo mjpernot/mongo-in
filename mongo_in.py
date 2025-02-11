@@ -271,14 +271,13 @@ def process_insert(cfg, dtg, log, fname):
     return status
 
 
-def insert_data(args, cfg, dtg, log):
+def insert_data(cfg, dtg, log):
 
     """Function:  insert_data
 
     Description:  Insert data into the Mongo database.
 
     Arguments:
-        (input) args -> ArgParser class instance
         (input) cfg -> Configuration setup
         (input) dtg -> Datatime class instance
         (input) log -> Log class instance
@@ -298,7 +297,10 @@ def insert_data(args, cfg, dtg, log):
         gen_libs.mv_file(fname, cfg.monitor_dir, cfg.archive_dir)
 
     if not status and cfg.to_addr:
+        log.log_info("insert_data:  Send email of Mongo insert failure.")
         mail = gen_class.setup_mail(cfg.to_addr, subj=cfg.subj)
+        mail.add_2_msg(f"Mongo failure insert - Look at {cfg.error_dir}")
+        mail.send_mail()
 
 
 def check_dirs(args, cfg):
