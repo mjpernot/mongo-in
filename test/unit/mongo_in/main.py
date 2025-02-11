@@ -59,7 +59,7 @@ class ArgParser():
         """
 
         self.cmdline = None
-        self.args_array = dict()
+        self.args_array = {}
         self.opt_req = None
         self.opt_req2 = True
         self.dir_perms_chk = None
@@ -111,7 +111,7 @@ class ArgParser():
 
         """
 
-        return True if arg in self.args_array else False
+        return arg in self.args_array
 
     def arg_file_chk(self, file_perm_chk):
 

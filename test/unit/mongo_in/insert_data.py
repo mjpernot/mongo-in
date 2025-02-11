@@ -21,8 +21,8 @@ import mock
 
 # Local
 sys.path.append(os.getcwd())
-import mongo_in
-import version
+import mongo_in                                 # pylint:disable=E0401,C0413
+import version                                  # pylint:disable=E0401,C0413
 
 __version__ = version.__version__
 
@@ -107,7 +107,7 @@ class Mail():
         return True
 
 
-class Cfg():
+class Cfg():                                            # pylint:disable=R0903
 
     """Class:  Cfg
 
@@ -136,7 +136,7 @@ class Cfg():
         self.subj = "Subject"
 
 
-class Cfg2():
+class Cfg2():                                           # pylint:disable=R0903
 
     """Class:  Cfg2
 
@@ -196,7 +196,7 @@ class UnitTest(unittest.TestCase):
         self.cfg2 = Cfg2()
         self.mail = Mail()
         self.dtg = TimeFormat()
-        self.insert_list = list()
+        self.insert_list = []
         self.insert_list2 = ["/path/file1"]
         self.insert_list3 = ["/path/file1", "/path/file2"]
 

@@ -146,14 +146,12 @@ try:
     from .lib import gen_libs
     from .lib import gen_class
     from .mongo_lib import mongo_libs
-    from .mongo_lib import mongo_class
     from . import version
 
 except (ValueError, ImportError) as err:
     import lib.gen_libs as gen_libs                     # pylint:disable=R0402
     import lib.gen_class as gen_class                   # pylint:disable=R0402
     import mongo_lib.mongo_libs as mongo_libs           # pylint:disable=R0402
-    import mongo_lib.mongo_class as mongo_class         # pylint:disable=R0402
     import version
 
 __version__ = version.__version__
@@ -218,8 +216,11 @@ def is_base64(data):
     """
 
     try:
-        status = True if base64.b64encode(
-            base64.b64decode(data))[1:70].decode() == data[1:70] else False
+        status = base64.b64encode(
+            base64.b64decode(data))[1:70].decode() == data[1:70]
+
+#        status = True if base64.b64encode(
+#            base64.b64decode(data))[1:70].decode() == data[1:70] else False
 
     except TypeError:
         status = False
@@ -315,7 +316,7 @@ def check_dirs(cfg):
 
     """
 
-    msg_dict = dict()
+    msg_dict = {}
     status, msg = gen_libs.chk_crt_dir(
         cfg.error_dir, write=True, create=True, no_print=True)
 
@@ -335,7 +336,7 @@ def check_dirs(cfg):
         msg_dict[cfg.monitor_dir] = msg
 
     return msg_dict
-    
+
 
 def run_program(args, func_dict):
 
@@ -360,10 +361,10 @@ def run_program(args, func_dict):
 
     if status:
         log = gen_class.Logger(
-            log_file, log_file, "INFO",
+            cfg.log_file, log_file, "INFO",
             "%(asctime)s %(levelname)s %(message)s", "%Y-%m-%dT%H:%M:%SZ")
         log.log_info("Program initialization.")
-        msg_dict = check_dirs(args, cfg)
+        msg_dict = check_dirs(cfg)
 
         if msg_dict:
             log.log_err("Validation of configuration directories failed")

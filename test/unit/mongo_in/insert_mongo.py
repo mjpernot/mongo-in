@@ -56,7 +56,6 @@ class TimeFormat():                                     # pylint:disable=R0903
         self.tformats = {
             "ymd": {"format": "%Y%m%d", "del": "", "micro": False}}
         rdtg = datetime.datetime.now()
-        msecs = str(rdtg.microsecond // 100)
         ext = ""
         texpr = "ymd"
         tformat = "ymd"
@@ -114,7 +113,8 @@ class Logger():
 
     """
 
-    def __init__(self, job_name, job_log, log_type, log_format, log_time):
+    def __init__(                                       # pylint:disable=R0913
+            self, job_name, job_log, log_type, log_format, log_time):
 
         """Method:  __init__
 

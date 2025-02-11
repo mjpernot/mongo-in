@@ -85,7 +85,7 @@ class UnitTest(unittest.TestCase):
         self.chk5 = (False, "Error_dir failure")
         self.chk9 = (False, "Monitor_dir failure")
         self.chk10 = (False, "Archive_dir failure")
-        self.results = dict()
+        self.results = {}
         self.results5 = {"/dir_path/error_dir": "Error_dir failure"}
         self.results9 = {"/dir_path/monitor_dir": "Monitor_dir failure"}
         self.results10 = {"/dir_path/archive_dir": "Archive_dir failure"}

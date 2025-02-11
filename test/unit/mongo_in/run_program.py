@@ -70,7 +70,7 @@ class ArgParser():
         """
 
         self.cmdline = None
-        self.args_array = dict()
+        self.args_array = {}
 
     def get_val(self, skey, def_val=None):
 
@@ -156,7 +156,7 @@ class Cfg():                                            # pylint:disable=R0903
 
         """Method:  __init__
 
-        Description:  Initialization instance of the CfgTest class.
+        Description:  Initialization instance of the Cfg class.
 
         Arguments:
 
