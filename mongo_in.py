@@ -230,14 +230,13 @@ def is_base64(data):
     return status
 
 
-def process_insert(args, cfg, dtg, log, fname):
+def process_insert(cfg, dtg, log, fname):
 
     """Function:  process_insert
 
     Description:  Process the insert file and send to a database.
 
     Arguments:
-        (input) args -> ArgParser class instance
         (input) cfg -> Configuration setup
         (input) dtg -> Datatime class instance
         (input) log -> Log class instance
@@ -290,11 +289,11 @@ def insert_data(args, cfg, dtg, log):
     status = True
     insert_list = gen_libs.filename_search(
         cfg.monitor_dir, cfg.file_regex, add_path=True)
-
     log.log_info("insert_data:  Processing files to insert.")
+
     for fname in insert_list:
         log.log_info(f"insert_data:  Processing file: {fname}")
-        status = status & process_insert(args, cfg, dtg, log, fname)
+        status = status & process_insert(cfg, dtg, log, fname)
         log.log_info("insert_data:  Post-processing of files.")
         gen_libs.mv_file(fname, cfg.monitor_dir, cfg.archive_dir)
 

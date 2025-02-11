@@ -27,31 +27,6 @@ import version                                  # pylint:disable=E0401,C0413
 __version__ = version.__version__
 
 
-class ArgParser():                                      # pylint:disable=R0903
-
-    """Class:  ArgParser
-
-    Description:  Class stub holder for gen_class.ArgParser class.
-
-    Methods:
-        __init__
-
-    """
-
-    def __init__(self):
-
-        """Method:  __init__
-
-        Description:  Class initialization.
-
-        Arguments:
-
-        """
-
-        self.cmdline = None
-        self.args_array = dict()
-
-
 class Cfg():                                            # pylint:disable=R0903
 
     """Class:  Cfg
@@ -181,8 +156,6 @@ class UnitTest(unittest.TestCase):
 
         """
 
-        self.args = ArgParser()
-        self.args.args_array = {"-d": "/config_path"}
         self.cfg = Cfg()
         self.dtg = Dtg()
         self.logger = Logger("Name", "Name", "INFO", "%(asctime)s%(message)s",
@@ -208,7 +181,7 @@ class UnitTest(unittest.TestCase):
 
         self.assertFalse(
             mongo_in.process_insert(
-                self.args, self.cfg, self.dtg, self.logger, self.in_file))
+                self.cfg, self.dtg, self.logger, self.in_file))
 
     @mock.patch("mongo_in.insert_mongo", mock.Mock(return_value=True))
     def test_mongo_successful(self):
@@ -223,7 +196,7 @@ class UnitTest(unittest.TestCase):
 
         self.assertTrue(
             mongo_in.process_insert(
-                self.args, self.cfg, self.dtg, self.logger, self.in_file))
+                self.cfg, self.dtg, self.logger, self.in_file))
 
     @mock.patch("mongo_in.insert_mongo", mock.Mock(return_value=True))
     def test_json_success(self):
@@ -238,7 +211,7 @@ class UnitTest(unittest.TestCase):
 
         self.assertTrue(
             mongo_in.process_insert(
-                self.args, self.cfg, self.dtg, self.logger, self.in_file3))
+                self.cfg, self.dtg, self.logger, self.in_file3))
 
     def test_json_failure(self):
 
@@ -252,7 +225,7 @@ class UnitTest(unittest.TestCase):
 
         self.assertFalse(
             mongo_in.process_insert(
-                self.args, self.cfg, self.dtg, self.logger, self.in_file2))
+                self.cfg, self.dtg, self.logger, self.in_file2))
 
     @mock.patch("mongo_in.insert_mongo", mock.Mock(return_value=True))
     def test_with_encoded_data(self):
@@ -267,7 +240,7 @@ class UnitTest(unittest.TestCase):
 
         self.assertTrue(
             mongo_in.process_insert(
-                self.args, self.cfg, self.dtg, self.logger, self.in_file))
+                self.cfg, self.dtg, self.logger, self.in_file))
 
 
 if __name__ == "__main__":
