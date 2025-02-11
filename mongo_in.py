@@ -132,6 +132,14 @@ exit 2
 # Standard
 import sys
 import os
+import ast
+import base64
+import binascii
+
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
 # Local
 try:
@@ -167,14 +175,13 @@ def help_message():
     print(__doc__)
 
 
-def insert_mongo(args, cfg, dtg, log, data):
+def insert_mongo(cfg, dtg, log, data):
 
     """Function:  insert_mongo
 
     Description:  Insert JSON document into Mongo database.
 
     Arguments:
-        (input) args -> ArgParser class instance
         (input) cfg -> Configuration setup
         (input) dtg -> Datatime class instance
         (input) log -> Log class instance
@@ -185,14 +192,39 @@ def insert_mongo(args, cfg, dtg, log, data):
 
     log.log_info("insert_mongo:  Inserting data into Mongo.")
     status = True
-    m_status = mongo_libs.ins_doc(cfg, cfg.dbs, cfg.tbl, line_json)
+    m_status = mongo_libs.ins_doc(cfg, cfg.dbs, cfg.tbl, data)
 
     if not m_status[0]:
         log.log_err("insert_mongo:  Insertion into Mongo failed.")
-        log.log_err(f"Mongo error message:  {mongo_stat[1]}")
+        log.log_err(f"Mongo error message:  {m_status[1]}")
         fname = os.path.join(
             cfg.error_dir, "mongo_insert_failed." + dtg.get_hack("ymd"))
-        gen_libs.write_file(fname=fname, mode="a", data=line_json)
+        gen_libs.write_file(fname=fname, mode="a", data=data)
+        status = False
+
+    return status
+
+
+def is_base64(data):
+
+    """Function:  is_base64
+
+    Description:  Determines if the data is base64 encoded.
+
+    Arguments:
+        (input) data -> Data string to be checked
+        (output) status -> True|False - Is base64 encoded
+
+    """
+
+    try:
+        status = True if base64.b64encode(
+            base64.b64decode(data))[1:70].decode() == data[1:70] else False
+
+    except TypeError:
+        status = False
+
+    except binascii.Error:
         status = False
 
     return status
@@ -231,7 +263,7 @@ def process_insert(args, cfg, dtg, log, fname):
             line_json = data
 
     if isinstance(line_json, dict):
-        status = insert_mongo(args, cfg, dtg, log, line_json)
+        status = insert_mongo(cfg, dtg, log, line_json)
 
     else:
         log.log_err("process_insert: Data failed to convert to JSON.")

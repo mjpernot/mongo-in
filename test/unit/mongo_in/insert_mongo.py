@@ -22,13 +22,13 @@ import mock
 
 # Local
 sys.path.append(os.getcwd())
-import mongo_in
-import version
+import mongo_in                                 # pylint:disable=E0401,C0413
+import version                                  # pylint:disable=E0401,C0413
 
 __version__ = version.__version__
 
 
-class TimeFormat():
+class TimeFormat():                                     # pylint:disable=R0903
 
     """Class:  TimeFormat
 
@@ -75,7 +75,7 @@ class TimeFormat():
         return self.thacks[tformat] if tformat in self.thacks else None
 
 
-class Cfg():
+class Cfg():                                            # pylint:disable=R0903
 
     """Class:  Cfg
 
