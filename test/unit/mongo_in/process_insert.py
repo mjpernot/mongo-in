@@ -2,10 +2,10 @@
 
 """Program:  process_insert.py
 
-    Description:  Unit testing of process_insert in pulled_search.py.
+    Description:  Unit testing of process_insert in mongo_in.py.
 
     Usage:
-        test/unit/pulled_search/process_insert.py
+        test/unit/mongo_in/process_insert.py
 
     Arguments:
 
@@ -21,13 +21,13 @@ import mock
 
 # Local
 sys.path.append(os.getcwd())
-import pulled_search
-import version
+import mongo_in                                 # pylint:disable=E0401,C0413
+import version                                  # pylint:disable=E0401,C0413
 
 __version__ = version.__version__
 
 
-class ArgParser(object):
+class ArgParser():                                      # pylint:disable=R0903
 
     """Class:  ArgParser
 
@@ -52,9 +52,9 @@ class ArgParser(object):
         self.args_array = dict()
 
 
-class CfgTest(object):
+class Cfg():                                            # pylint:disable=R0903
 
-    """Class:  CfgTest
+    """Class:  Cfg
 
     Description:  Class which is a representation of a cfg module.
 
@@ -67,7 +67,7 @@ class CfgTest(object):
 
         """Method:  __init__
 
-        Description:  Initialization instance of the CfgTest class.
+        Description:  Initialization instance of the Cfg class.
 
         Arguments:
 
@@ -76,7 +76,31 @@ class CfgTest(object):
         self.mconfig = "mongo"
 
 
-class Logger(object):
+class Dtg():                                            # pylint:disable=R0903
+
+    """Class:  Dtg
+
+    Description:  Class which is a representation of a Dtg module.
+
+    Methods:
+        __init__
+
+    """
+
+    def __init__(self):
+
+        """Method:  __init__
+
+        Description:  Initialization instance of the Dtg class.
+
+        Arguments:
+
+        """
+
+        self.dtg = "DTG"
+
+
+class Logger():
 
     """Class:  Logger
 
@@ -159,18 +183,19 @@ class UnitTest(unittest.TestCase):
 
         self.args = ArgParser()
         self.args.args_array = {"-d": "/config_path"}
-        self.cfg = CfgTest()
+        self.cfg = Cfg()
+        self.dtg = Dtg()
         self.logger = Logger("Name", "Name", "INFO", "%(asctime)s%(message)s",
                              "%m-%d-%YT%H:%M:%SZ|")
         base = os.getcwd()
         self.in_file = os.path.join(
-            base, "test/unit/pulled_search/testfiles/test_docid.json")
+            base, "test/unit/mongo_in/testfiles/test_process_insert.json")
         self.in_file2 = os.path.join(
-            base, "test/unit/pulled_search/testfiles/test_docid2.json")
+            base, "test/unit/mongo_in/testfiles/test_process_insert2.json")
         self.in_file3 = os.path.join(
-            base, "test/unit/pulled_search/testfiles/test_docid3.json")
+            base, "test/unit/mongo_in/testfiles/test_process_insert3.json")
 
-    @mock.patch("pulled_search.parse_data", mock.Mock(return_value=False))
+    @mock.patch("mongo_in.insert_mongo", mock.Mock(return_value=False))
     def test_mongo_failed(self):
 
         """Function:  test_mongo_failed
@@ -181,11 +206,11 @@ class UnitTest(unittest.TestCase):
 
         """
 
-        self.assertEqual(
-            pulled_search.process_insert(
-                self.args, self.cfg, self.in_file, self.logger), False)
+        self.assertFalse(
+            mongo_in.process_insert(
+                self.args, self.cfg, self.dtg, self.logger, self.in_file))
 
-    @mock.patch("pulled_search.parse_data", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.insert_mongo", mock.Mock(return_value=True))
     def test_mongo_successful(self):
 
         """Function:  test_mongo_successful
@@ -196,11 +221,11 @@ class UnitTest(unittest.TestCase):
 
         """
 
-        self.assertEqual(
-            pulled_search.process_insert(
-                self.args, self.cfg, self.in_file, self.logger), True)
+        self.assertTrue(
+            mongo_in.process_insert(
+                self.args, self.cfg, self.dtg, self.logger, self.in_file))
 
-    @mock.patch("pulled_search.parse_data", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.insert_mongo", mock.Mock(return_value=True))
     def test_json_success(self):
 
         """Function:  test_json_success
@@ -211,9 +236,9 @@ class UnitTest(unittest.TestCase):
 
         """
 
-        self.assertEqual(
-            pulled_search.process_insert(
-                self.args, self.cfg, self.in_file3, self.logger), True)
+        self.assertTrue(
+            mongo_in.process_insert(
+                self.args, self.cfg, self.dtg, self.logger, self.in_file3))
 
     def test_json_failure(self):
 
@@ -225,11 +250,11 @@ class UnitTest(unittest.TestCase):
 
         """
 
-        self.assertEqual(
-            pulled_search.process_insert(
-                self.args, self.cfg, self.in_file2, self.logger), False)
+        self.assertFalse(
+            mongo_in.process_insert(
+                self.args, self.cfg, self.dtg, self.logger, self.in_file2))
 
-    @mock.patch("pulled_search.parse_data", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.insert_mongo", mock.Mock(return_value=True))
     def test_with_encoded_data(self):
 
         """Function:  test_with_encoded_data
@@ -240,9 +265,9 @@ class UnitTest(unittest.TestCase):
 
         """
 
-        self.assertEqual(
-            pulled_search.process_insert(
-                self.args, self.cfg, self.in_file, self.logger), True)
+        self.assertTrue(
+            mongo_in.process_insert(
+                self.args, self.cfg, self.dtg, self.logger, self.in_file))
 
 
 if __name__ == "__main__":
