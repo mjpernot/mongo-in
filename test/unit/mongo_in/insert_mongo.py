@@ -2,10 +2,10 @@
 
 """Program:  insert_mongo.py
 
-    Description:  Unit testing of insert_mongo in pulled_search.py.
+    Description:  Unit testing of insert_mongo in mongo_in.py.
 
     Usage:
-        test/unit/pulled_search/insert_mongo.py
+        test/unit/mongo_in/insert_mongo.py
 
     Arguments:
 
@@ -16,27 +16,27 @@
 # Standard
 import sys
 import os
+import datetime
 import unittest
 import mock
 
 # Local
 sys.path.append(os.getcwd())
-import pulled_search
+import mongo_in
 import version
 
 __version__ = version.__version__
 
 
-class Mail(object):
+class TimeFormat():
 
-    """Class:  Mail
+    """Class:  TimeFormat
 
-    Description:  Class stub holder for gen_class.Mail class.
+    Description:  Class stub holder for gen_class.TimeFormat class.
 
     Methods:
         __init__
-        add_2_msg
-        send_mail
+        get_hack
 
     """
 
@@ -50,75 +50,34 @@ class Mail(object):
 
         """
 
-        self.data = None
+        self.delimit = "."
+        self.micro = False
+        self.thacks = {}
+        self.tformats = {
+            "ymd": {"format": "%Y%m%d", "del": "", "micro": False}}
+        rdtg = datetime.datetime.now()
+        msecs = str(rdtg.microsecond // 100)
+        ext = ""
+        texpr = "ymd"
+        tformat = "ymd"
+        self.thacks[tformat] = datetime.datetime.strftime(rdtg, texpr) + ext
 
-    def add_2_msg(self, data):
+    def get_hack(self, tformat):
 
-        """Method:  add_2_msg
+        """Method:  get_hack
 
-        Description:  Stub method holder for Mail.add_2_msg.
-
-        Arguments:
-
-        """
-
-        self.data = data
-
-        return True
-
-    def send_mail(self):
-
-        """Method:  send_mail
-
-        Description:  Stub method holder for Mail.send_mail.
+        Description:  Stub method holder for TimeFormat.get_hack.
 
         Arguments:
 
         """
 
-        return True
+        return self.thacks[tformat] if tformat in self.thacks else None
 
 
-class ArgParser(object):
+class Cfg():
 
-    """Class:  ArgParser
-
-    Description:  Class stub holder for gen_class.ArgParser class.
-
-    Methods:
-        __init__
-        get_val
-
-    """
-
-    def __init__(self):
-
-        """Method:  __init__
-
-        Description:  Class initialization.
-
-        Arguments:
-
-        """
-
-        self.args_array = {"-d": "/config_path"}
-
-    def get_val(self, skey, def_val=None):
-
-        """Method:  get_val
-
-        Description:  Method stub holder for gen_class.ArgParser.get_val.
-
-        Arguments:
-
-        """
-
-        return self.args_array.get(skey, def_val)
-
-
-class CfgTest(object):
-
-    """Class:  CfgTest
+    """Class:  Cfg
 
     Description:  Class which is a representation of a cfg module.
 
@@ -131,42 +90,18 @@ class CfgTest(object):
 
         """Method:  __init__
 
-        Description:  Initialization instance of the CfgTest class.
+        Description:  Initialization instance of the Cfg class.
 
         Arguments:
 
         """
 
-        self.mconfig = "mongo"
-        self.merror_dir = "/dir/path"
-
-
-class MCfgTest(object):
-
-    """Class:  MCfgTest
-
-    Description:  Class which is a representation of a cfg module for Mongo.
-
-    Methods:
-        __init__
-
-    """
-
-    def __init__(self):
-
-        """Method:  __init__
-
-        Description:  Initialization instance of the CfgTest class.
-
-        Arguments:
-
-        """
-
+        self.error_dir = "/dir/path"
         self.dbs = "database_name"
         self.tbl = "table_name"
 
 
-class Logger(object):
+class Logger():
 
     """Class:  Logger
 
@@ -229,7 +164,6 @@ class UnitTest(unittest.TestCase):
 
     Methods:
         setUp
-        test_mongo_failed_email
         test_mongo_failed
         test_mongo_successful
 
@@ -245,48 +179,17 @@ class UnitTest(unittest.TestCase):
 
         """
 
-        self.args = ArgParser()
-        self.cfg = CfgTest()
-        self.mcfg = MCfgTest()
-        self.mail = Mail()
+        self.cfg = Cfg()
+        self.dtg = TimeFormat()
         self.logger = Logger("Name", "Name", "INFO", "%(asctime)s%(message)s",
                              "%m-%d-%YT%H:%M:%SZ|")
-        self.data = {
-            "docid": "09109uosdhf", "command": "COMMAND",
-            "pubDate": "20200102-101134", "network": "ENCLAVE",
-            "asOf": "20200306 084503", "entry": "data_line",
-            "logTime": "log_time", "userID": "user_id", "requestMethod": "GET"}
+        self.data = {"asOf": "20200306 084503", "entry": "data_line"}
 
-    @mock.patch("pulled_search.gen_libs.write_file",
+    @mock.patch("mongo_in.gen_libs.write_file",
                 mock.Mock(return_value=True))
-    @mock.patch("pulled_search.mongo_libs.ins_doc",
+    @mock.patch("mongo_in.mongo_libs.ins_doc",
                 mock.Mock(return_value=(False, "mongo failure")))
-    @mock.patch("pulled_search.gen_class.setup_mail")
-    @mock.patch("pulled_search.gen_libs.load_module")
-    def test_mongo_failed_email(self, mock_load, mock_mail):
-
-        """Function:  test_mongo_failed_email
-
-        Description:  Test with failed Mongo data insertion.
-
-        Arguments:
-
-        """
-
-        self.args.args_array["-t"] = "email_address"
-
-        mock_load.return_value = self.mcfg
-        mock_mail.return_value = self.mail
-
-        self.assertFalse(pulled_search.insert_mongo(
-            self.args, self.cfg, self.logger, self.data))
-
-    @mock.patch("pulled_search.gen_libs.write_file",
-                mock.Mock(return_value=True))
-    @mock.patch("pulled_search.mongo_libs.ins_doc",
-                mock.Mock(return_value=(False, "mongo failure")))
-    @mock.patch("pulled_search.gen_libs.load_module")
-    def test_mongo_failed(self, mock_load):
+    def test_mongo_failed(self):
 
         """Function:  test_mongo_failed
 
@@ -296,15 +199,12 @@ class UnitTest(unittest.TestCase):
 
         """
 
-        mock_load.return_value = self.mcfg
+        self.assertFalse(mongo_in.insert_mongo(
+            self.cfg, self.dtg, self.logger, self.data))
 
-        self.assertFalse(pulled_search.insert_mongo(
-            self.args, self.cfg, self.logger, self.data))
-
-    @mock.patch("pulled_search.mongo_libs.ins_doc",
+    @mock.patch("mongo_in.mongo_libs.ins_doc",
                 mock.Mock(return_value=(True, None)))
-    @mock.patch("pulled_search.gen_libs.load_module")
-    def test_mongo_successful(self, mock_load):
+    def test_mongo_successful(self):
 
         """Function:  test_mongo_successful
 
@@ -314,10 +214,8 @@ class UnitTest(unittest.TestCase):
 
         """
 
-        mock_load.return_value = self.mcfg
-
-        self.assertTrue(pulled_search.insert_mongo(
-            self.args, self.cfg, self.logger, self.data))
+        self.assertTrue(mongo_in.insert_mongo(
+            self.cfg, self.dtg, self.logger, self.data))
 
 
 if __name__ == "__main__":
