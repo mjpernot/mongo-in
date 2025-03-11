@@ -28,7 +28,7 @@ import version                                  # pylint:disable=E0401,C0413
 __version__ = version.__version__
 
 
-def insert_data(args_array, cfg, dtg, log):
+def insert_data(cfg, dtg, log):
 
     """Function:  insert_data
 
@@ -40,7 +40,7 @@ def insert_data(args_array, cfg, dtg, log):
 
     status = True
 
-    if args_array and cfg and log and dtg:
+    if cfg and log and dtg:
         status = True
 
     return status
