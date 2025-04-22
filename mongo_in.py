@@ -302,7 +302,7 @@ def insert_data(cfg, dtg, log, args):
                 os.remove(os.path.join(cfg.monitor_dir, fname))
 
             else:
-                log.log_info("insert_data:  Moving file to archive.")
+                log.log_info("insert_data: Moving file to archive.")
                 gen_libs.mv_file(fname, cfg.monitor_dir, cfg.archive_dir)
 
         else:
