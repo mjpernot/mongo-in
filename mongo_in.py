@@ -290,7 +290,7 @@ def insert_data(cfg, dtg, log, args):
     log.log_info("insert_data:  Searching for new files.")
     insert_list = gen_libs.filename_search(
         cfg.monitor_dir, cfg.file_regex, add_path=True)
-    log.log_info("insert_data:  Processing files to insert.")
+    log.log_info("insert_data:  Processing files for insert.")
 
     for fname in insert_list:
         log.log_info(f"insert_data:  Processing file: {fname}")
