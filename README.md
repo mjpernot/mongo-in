@@ -8,7 +8,7 @@
 ###  This README file is broken down into the following sections:
   * Features
   * Prerequisites
-    - FIPS Environment
+    - Secure Environment
   * Installation
   * Configuration
   * Program Help Function
@@ -26,7 +26,7 @@
     - python3-devel
     - gcc
 
-  * FIPS Environment:  If operating in a FIPS 104-2 environment, this package will require at least a minimum of pymongo==3.8.0 or better.  It will also require a manual change to the auth.py module in the pymongo package.  See below for changes to auth.py.
+  * Secure Environment:  If operating in a Secure environment, this package will require at least a minimum of pymongo==3.8.0 or better.  It will also require a manual change to the auth.py module in the pymongo package.  See below for changes to auth.py.
     - Locate the auth.py file python installed packages on the system in the pymongo package directory.
     - Edit the file and locate the \_password_digest function.
     - In the \_password_digest function there is an line that should match: "md5hash = hashlib.md5()".  Change it to "md5hash = hashlib.md5(usedforsecurity=False)".
@@ -79,7 +79,7 @@ Create Mongodb configuration file.  Make the appropriate change to the environme
 
   * Notes for auth_mech configuration entry:
     - NOTE 1:  SCRAM-SHA-256 only works for Mongodb 4.0 and better.
-    - NOTE 2:  FIPS 140-2 environment requires SCRAM-SHA-1 or SCRAM-SHA-256.
+    - NOTE 2:  Secure environment requires SCRAM-SHA-1 or SCRAM-SHA-256.
 
   * If connecting to a Mongo replica set, otherwise set to None.
     - repset = "REPLICA_SET_NAME"
@@ -99,16 +99,12 @@ Create Mongodb configuration file.  Make the appropriate change to the environme
         -> tls_certkey = None
         -> tls_certkey_phrase = None
 
-  * FIPS Environment for Mongo:  If operating in a FIPS 104-2 environment, this package will require at least a minimum of pymongo==3.8.0 or better.  It will also require a manual change to the auth.py module in the pymongo package.  See below for changes to auth.py.
-    - Locate the auth.py file python installed packages on the system in the pymongo package directory.
-    - Edit the file and locate the "\_password_digest" function.
-    - In the "\_password_digest" function there is an line that should match: "md5hash = hashlib.md5()".  Change it to "md5hash = hashlib.md5(usedforsecurity=False)".
-    - Lastly, it will require the Mongo configuration file entry auth_mech to be set to: SCRAM-SHA-1 or SCRAM-SHA-256.
+  * Secure Environment for Mongo:  See Prerequisites -> Secure Environment section for details.
 
 ```
 cp config/mongo.py.TEMPLATE config/mongo.py
-vim config/mongo.py
 chmod 600 config/mongo.py
+vim config/mongo.py
 ```
 
 

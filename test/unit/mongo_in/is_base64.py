@@ -34,6 +34,7 @@ class UnitTest(unittest.TestCase):
 
     Methods:
         setUp
+        test_with_str_data6
         test_with_str_data5
         test_with_str_data4
         test_with_str_data3
@@ -59,6 +60,19 @@ class UnitTest(unittest.TestCase):
         self.data4 = 'this is a testa over and over12'
         self.data5 = 'this is a testa over and over123'
         self.data6 = 'this is a testa over and over1234'
+        self.data7 = 12345
+
+    def test_with_str_data6(self):
+
+        """Function:  test_with_str_data6
+
+        Description:  Test with integer data.
+
+        Arguments:
+
+        """
+
+        self.assertFalse(mongo_in.is_base64(self.data7))
 
     def test_with_str_data5(self):
 

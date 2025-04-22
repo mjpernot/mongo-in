@@ -31,6 +31,7 @@ exit 2
         -c cfg_file => Mongo configuration file.
         -d dir path => Config directory path.
         -I => Insert file with JSON documents into database.
+            -r => Do not archive file, remove file after insert.
 
         -v => Display version of this program.
         -h => Help and usage message.
@@ -219,9 +220,6 @@ def is_base64(data):
         status = base64.b64encode(
             base64.b64decode(data))[1:70].decode() == data[1:70]
 
-#        status = True if base64.b64encode(
-#            base64.b64decode(data))[1:70].decode() == data[1:70] else False
-
     except TypeError:
         status = False
 
@@ -272,7 +270,7 @@ def process_insert(cfg, dtg, log, fname):
     return status
 
 
-def insert_data(cfg, dtg, log):
+def insert_data(cfg, dtg, log, args):
 
     """Function:  insert_data
 
@@ -282,26 +280,39 @@ def insert_data(cfg, dtg, log):
         (input) cfg -> Configuration setup
         (input) dtg -> Datatime class instance
         (input) log -> Log class instance
+        (input) args -> ArgParser class instance
 
     """
 
     log.log_info("insert_data:  Searching for new files.")
-    status = True
     insert_list = gen_libs.filename_search(
         cfg.monitor_dir, cfg.file_regex, add_path=True)
-    log.log_info("insert_data:  Processing files to insert.")
+    log.log_info("insert_data:  Processing files for insert.")
 
     for fname in insert_list:
         log.log_info(f"insert_data:  Processing file: {fname}")
-        status = status & process_insert(cfg, dtg, log, fname)
-        log.log_info("insert_data:  Post-processing of files.")
-        gen_libs.mv_file(fname, cfg.monitor_dir, cfg.archive_dir)
+        status = process_insert(cfg, dtg, log, fname)
 
-    if not status and cfg.to_addr:
-        log.log_info("insert_data:  Send email of Mongo insert failure.")
-        mail = gen_class.setup_mail(cfg.to_addr, subj=cfg.subj)
-        mail.add_2_msg(f"Mongo failure insert - Look at {cfg.error_dir}")
-        mail.send_mail()
+        if status:
+            if args.arg_exist("-r"):
+                log.log_info("insert_data:  Removing file.")
+                os.remove(os.path.join(cfg.monitor_dir, fname))
+
+            else:
+                log.log_info("insert_data: Moving file to archive.")
+                gen_libs.mv_file(fname, cfg.monitor_dir, cfg.archive_dir)
+
+        else:
+            log.log_warn(f"insert_data:  Insert failed for file: {fname}")
+            gen_libs.mv_file(fname, cfg.monitor_dir, cfg.error_dir)
+
+            if cfg.to_addr:
+                log.log_warn(
+                    "insert_data:  Sending email of Mongo insert failure.")
+                mail = gen_class.setup_mail(cfg.to_addr, subj=cfg.subj)
+                mail.add_2_msg(
+                    f"Insert failure: File: {fname} moved to {cfg.error_dir}")
+                mail.send_mail()
 
 
 def check_dirs(cfg):
@@ -373,7 +384,7 @@ def run_program(args, func_dict):
         else:
             # Intersect args_array & func_dict to determine function calls
             for func in set(args.get_args_keys()) & set(func_dict.keys()):
-                func_dict[func](cfg, dtg, log)
+                func_dict[func](cfg, dtg, log, args)
 
     else:
         print("Error: Logger Directory Check Failure")
@@ -420,7 +431,7 @@ def main():
 
         except gen_class.SingleInstanceException:
             print(f'WARNING:  lock in place for mongo_in with id of:'
-                  f'{args.get_val("-y", def_val="")}')
+                  f' {args.get_val("-y", def_val="")}')
 
 
 if __name__ == "__main__":
