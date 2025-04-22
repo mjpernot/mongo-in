@@ -220,9 +220,6 @@ def is_base64(data):
         status = base64.b64encode(
             base64.b64decode(data))[1:70].decode() == data[1:70]
 
-#        status = True if base64.b64encode(
-#            base64.b64decode(data))[1:70].decode() == data[1:70] else False
-
     except TypeError:
         status = False
 
@@ -434,7 +431,7 @@ def main():
 
         except gen_class.SingleInstanceException:
             print(f'WARNING:  lock in place for mongo_in with id of:'
-                  f'{args.get_val("-y", def_val="")}')
+                  f' {args.get_val("-y", def_val="")}')
 
 
 if __name__ == "__main__":
