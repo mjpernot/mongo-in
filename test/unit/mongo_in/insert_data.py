@@ -165,6 +165,46 @@ class Cfg2():                                           # pylint:disable=R0903
         self.subj = None
 
 
+class ArgParser():                                      # pylint:disable=R0903
+
+    """Class:  ArgParser
+
+    Description:  Class stub holder for gen_class.ArgParser class.
+
+    Methods:
+        __init__
+        arg_exist
+
+    """
+
+    def __init__(self):
+
+        """Method:  __init__
+
+        Description:  Class initialization.
+
+        Arguments:
+
+        """
+
+        self.args_array = {
+            "-c": "mysql_cfg", "-d": "config", "-e": "to_addr",
+            "-o": "outfile", "-n": "indentation",
+            "-i": "database:table", "-w": "a", "-p": False}
+
+    def arg_exist(self, arg):
+
+        """Method:  arg_exist
+
+        Description:  Method stub holder for gen_class.ArgParser.arg_exist.
+
+        Arguments:
+
+        """
+
+        return arg in self.args_array
+
+
 class UnitTest(unittest.TestCase):
 
     """Class:  UnitTest
@@ -173,12 +213,13 @@ class UnitTest(unittest.TestCase):
 
     Methods:
         setUp
-        test_with_fail_insert
+        test_with_remove_file
+        test_with_archive_file
+        test_with_fail_insert_no_mail
+        test_with_fail_insert_mail
         test_with_multiple_files
         test_with_single_file
         test_with_no_files
-        test_with_no_mail
-        test_with_mail
 
     """
 
@@ -192,6 +233,7 @@ class UnitTest(unittest.TestCase):
 
         """
 
+        self.args = ArgParser()
         self.cfg = Cfg()
         self.cfg2 = Cfg2()
         self.mail = Mail()
@@ -200,16 +242,58 @@ class UnitTest(unittest.TestCase):
         self.insert_list2 = ["/path/file1"]
         self.insert_list3 = ["/path/file1", "/path/file2"]
 
+    @mock.patch("mongo_in.os.remove", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.process_insert", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.gen_libs.filename_search")
+    @mock.patch("mongo_in.gen_class.Logger")
+    def test_with_remove_file(self, mock_log, mock_search):
+
+        """Function:  test_with_remove_file
+
+        Description:  Test with removing the file after insert.
+
+        Arguments:
+
+        """
+
+        self.args.args_array["-r"] = True
+
+        mock_log.return_value = True
+        mock_search.return_value = self.insert_list2
+
+        self.assertFalse(
+            mongo_in.insert_data(self.cfg, self.dtg, mock_log, self.args))
+
+    @mock.patch("mongo_in.gen_libs.mv_file", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.process_insert", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.gen_libs.filename_search")
+    @mock.patch("mongo_in.gen_class.Logger")
+    def test_with_archive_file(self, mock_log, mock_search):
+
+        """Function:  test_with_archive_file
+
+        Description:  Test with archiving the file after insert.
+
+        Arguments:
+
+        """
+
+        mock_log.return_value = True
+        mock_search.return_value = self.insert_list2
+
+        self.assertFalse(
+            mongo_in.insert_data(self.cfg, self.dtg, mock_log, self.args))
+
     @mock.patch("mongo_in.gen_libs.mv_file", mock.Mock(return_value=True))
     @mock.patch("mongo_in.process_insert", mock.Mock(return_value=False))
     @mock.patch("mongo_in.gen_class.setup_mail")
     @mock.patch("mongo_in.gen_libs.filename_search")
     @mock.patch("mongo_in.gen_class.Logger")
-    def test_with_fail_insert(self, mock_log, mock_search, mock_mail):
+    def test_with_fail_insert_no_mail(self, mock_log, mock_search, mock_mail):
 
-        """Function:  test_with_fail_insert
+        """Function:  test_with_fail_insert_no_mail
 
-        Description:  Test with failed insert of file.
+        Description:  Test with failed insert of file but no mail.
 
         Arguments:
 
@@ -220,7 +304,29 @@ class UnitTest(unittest.TestCase):
         mock_mail.return_value = self.mail
 
         self.assertFalse(
-            mongo_in.insert_data(self.cfg, self.dtg, mock_log))
+            mongo_in.insert_data(self.cfg2, self.dtg, mock_log, self.args))
+
+    @mock.patch("mongo_in.gen_libs.mv_file", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.process_insert", mock.Mock(return_value=False))
+    @mock.patch("mongo_in.gen_class.setup_mail")
+    @mock.patch("mongo_in.gen_libs.filename_search")
+    @mock.patch("mongo_in.gen_class.Logger")
+    def test_with_fail_insert_mail(self, mock_log, mock_search, mock_mail):
+
+        """Function:  test_with_fail_insert_mail
+
+        Description:  Test with failed insert of file and mail.
+
+        Arguments:
+
+        """
+
+        mock_log.return_value = True
+        mock_search.return_value = self.insert_list2
+        mock_mail.return_value = self.mail
+
+        self.assertFalse(
+            mongo_in.insert_data(self.cfg, self.dtg, mock_log, self.args))
 
     @mock.patch("mongo_in.gen_libs.mv_file", mock.Mock(return_value=True))
     @mock.patch("mongo_in.process_insert", mock.Mock(return_value=True))
@@ -240,7 +346,7 @@ class UnitTest(unittest.TestCase):
         mock_search.return_value = self.insert_list3
 
         self.assertFalse(
-            mongo_in.insert_data(self.cfg, self.dtg, mock_log))
+            mongo_in.insert_data(self.cfg, self.dtg, mock_log, self.args))
 
     @mock.patch("mongo_in.gen_libs.mv_file", mock.Mock(return_value=True))
     @mock.patch("mongo_in.process_insert", mock.Mock(return_value=True))
@@ -260,7 +366,7 @@ class UnitTest(unittest.TestCase):
         mock_search.return_value = self.insert_list2
 
         self.assertFalse(
-            mongo_in.insert_data(self.cfg, self.dtg, mock_log))
+            mongo_in.insert_data(self.cfg, self.dtg, mock_log, self.args))
 
     @mock.patch("mongo_in.gen_libs.filename_search")
     @mock.patch("mongo_in.gen_class.Logger")
@@ -278,48 +384,7 @@ class UnitTest(unittest.TestCase):
         mock_search.return_value = self.insert_list
 
         self.assertFalse(
-            mongo_in.insert_data(self.cfg, self.dtg, mock_log))
-
-    @mock.patch("mongo_in.gen_libs.mv_file", mock.Mock(return_value=True))
-    @mock.patch("mongo_in.gen_libs.filename_search")
-    @mock.patch("mongo_in.gen_class.Logger")
-    def test_with_no_mail(self, mock_log, mock_search):
-
-        """Function:  test_with_no_mail
-
-        Description:  Test with no mail setup.
-
-        Arguments:
-
-        """
-
-        mock_log.return_value = True
-        mock_search.return_value = self.insert_list
-
-        self.assertFalse(
-            mongo_in.insert_data(self.cfg2, self.dtg, mock_log))
-
-    @mock.patch("mongo_in.gen_libs.mv_file", mock.Mock(return_value=True))
-    @mock.patch("mongo_in.gen_class.setup_mail", mock.Mock(return_value=True))
-    @mock.patch("mongo_in.gen_class.setup_mail")
-    @mock.patch("mongo_in.gen_libs.filename_search")
-    @mock.patch("mongo_in.gen_class.Logger")
-    def test_with_mail(self, mock_log, mock_search, mock_mail):
-
-        """Function:  test_with_mail
-
-        Description:  Test with mail setup.
-
-        Arguments:
-
-        """
-
-        mock_log.return_value = True
-        mock_search.return_value = self.insert_list
-        mock_mail.return_value = self.mail
-
-        self.assertFalse(
-            mongo_in.insert_data(self.cfg, self.dtg, mock_log))
+            mongo_in.insert_data(self.cfg, self.dtg, mock_log, self.args))
 
 
 if __name__ == "__main__":
