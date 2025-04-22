@@ -295,20 +295,22 @@ def insert_data(cfg, dtg, log, args):
     for fname in insert_list:
         log.log_info(f"insert_data:  Processing file: {fname}")
         status = process_insert(cfg, dtg, log, fname)
-        log.log_info("insert_data:  Post-processing of files.")
 
         if status:
             if args.arg_exist("-r"):
+                log.log_info("insert_data:  Removing file.")
                 os.remove(os.path.join(cfg.monitor_dir, fname))
 
             else:
+                log.log_info("insert_data:  Moving file to archive.")
                 gen_libs.mv_file(fname, cfg.monitor_dir, cfg.archive_dir)
 
         else:
+            log.log_warn(f"insert_data:  Insert failed for file: {fname}")
             gen_libs.mv_file(fname, cfg.monitor_dir, cfg.error_dir)
 
             if cfg.to_addr:
-                log.log_info(
+                log.log_warn(
                     "insert_data:  Sending email of Mongo insert failure.")
                 mail = gen_class.setup_mail(cfg.to_addr, subj=cfg.subj)
                 mail.add_2_msg(
