@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on "Keep a Changelog".  This project adheres to Semantic Versioning.
 
 
+## [0.1.1] - 2025-05-09
+
+### Fixed
+- process_insert: Replaced data_conversion call and also added additional checks on the data type of the object being converted.
+
+### Added
+- data_conversion: Convert data.
+
+
 ## [0.1.0] - 2025-04-22
 Alpha Release
 - Updated python-lib v4.0.1
