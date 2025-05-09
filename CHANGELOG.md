@@ -7,7 +7,10 @@ The format is based on "Keep a Changelog".  This project adheres to Semantic Ver
 ## [0.1.1] - 2025-05-09
 
 ### Fixed
-- process_insert: Replaced json.load with ast.literal_eval call and also further checks on if data object is a dictionary.
+- process_insert: Replaced data_conversion call and also added additional checks on the data type of the object being converted.
+
+### Added
+- data_conversion: Convert data.
 
 
 ## [0.1.0] - 2025-04-22
