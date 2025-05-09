@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on "Keep a Changelog".  This project adheres to Semantic Versioning.
 
 
+## [0.1.1] - 2025-05-09
+
+### Fixed
+- process_insert: Replaced json.load with ast.literal_eval call and also further checks on if data object is a dictionary.
+
+
 ## [0.1.0] - 2025-04-22
 Alpha Release
 - Updated python-lib v4.0.1

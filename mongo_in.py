@@ -137,10 +137,10 @@ import ast
 import base64
 import binascii
 
-try:
-    import simplejson as json
-except ImportError:
-    import json
+#try:
+#    import simplejson as json
+#except ImportError:
+#    import json
 
 # Local
 try:
@@ -253,12 +253,18 @@ def process_insert(cfg, dtg, log, fname):
     if is_base64(data):
         line_json = ast.literal_eval(base64.b64decode(data).decode())
 
-    else:
-        try:
-            line_json = json.loads(data)
+    elif not isinstance(data, dict):
+        line_json = ast.literal_eval(data)
 
-        except ValueError:
-            line_json = data
+    else:
+        line_json = data
+
+#    else:
+#        try:
+#            line_json = json.loads(data)
+#
+#        except ValueError:
+#            line_json = data
 
     if isinstance(line_json, dict):
         status = insert_mongo(cfg, dtg, log, line_json)
