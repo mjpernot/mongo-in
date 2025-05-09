@@ -21,8 +21,8 @@ exit 2
 
    Program:  mongo_in.py
 
-    Description:  Program to take an external JSON document (file) and insert
-        into a Mongo database.
+    Description:  Program to take an external dictionary document (file) and
+        insert into a Mongo database.
 
     Usage:
         mongo_in.py -c cfg_file -d path -I [-v | -h]
@@ -30,7 +30,7 @@ exit 2
     Arguments:
         -c cfg_file => Mongo configuration file.
         -d dir path => Config directory path.
-        -I => Insert file with JSON documents into database.
+        -I => Insert file with dictionary documents into database.
             -r => Do not archive file, remove file after insert.
 
         -v => Display version of this program.
@@ -137,11 +137,6 @@ import ast
 import base64
 import binascii
 
-try:
-    import simplejson as json
-except ImportError:
-    import json
-
 # Local
 try:
     from .lib import gen_libs
@@ -178,13 +173,13 @@ def insert_mongo(cfg, dtg, log, data):
 
     """Function:  insert_mongo
 
-    Description:  Insert JSON document into Mongo database.
+    Description:  Insert dictionary document into Mongo database.
 
     Arguments:
         (input) cfg -> Configuration setup
         (input) dtg -> Datatime class instance
         (input) log -> Log class instance
-        (input) line_json -> JSON document
+        (input) data -> Dictionary document
         (output) status -> True|False - Successful insertion into Mongo
 
     """
@@ -229,6 +224,29 @@ def is_base64(data):
     return status
 
 
+def data_conversion(data, log):
+
+    """Function:  data_conversion
+
+    Description:  Convert data.
+
+    Arguments:
+        (input) data -> Data object to convert
+        (input) log -> Log class instance
+        (output) data_convert -> Converted data object
+
+    """
+
+    try:
+        data_convert = ast.literal_eval(data)
+
+    except SyntaxError:
+        log.log_err("data_conversion: Failed ast.literal_eval conversion")
+        data_convert = None
+
+    return data_convert
+
+
 def process_insert(cfg, dtg, log, fname):
 
     """Function:  process_insert
@@ -244,27 +262,32 @@ def process_insert(cfg, dtg, log, fname):
 
     """
 
-    log.log_info("process_insert:  Converting data to JSON.")
+    log.log_info("process_insert:  Converting data to dictionary.")
 
     with open(fname, mode="r", encoding="UTF-8") as fhdr:
         data = fhdr.read()
 
     # Check the first 70 chars in case the encoded is split into multiple lines
     if is_base64(data):
-        line_json = ast.literal_eval(base64.b64decode(data).decode())
+        data_convert = ast.literal_eval(base64.b64decode(data).decode())
+
+    elif not isinstance(data, dict):
+        data_convert = data_conversion(data, log)
 
     else:
-        try:
-            line_json = json.loads(data)
+        data_convert = data
 
-        except ValueError:
-            line_json = data
+    # This is for files that come in with objects that are quoted within the
+    #   file, therefore the object will be required to be converted twice to
+    #   remove the quotes and convert the data
+    if isinstance(data_convert, str):
+        data_convert = data_conversion(data_convert, log)
 
-    if isinstance(line_json, dict):
-        status = insert_mongo(cfg, dtg, log, line_json)
+    if isinstance(data_convert, dict):
+        status = insert_mongo(cfg, dtg, log, data_convert)
 
     else:
-        log.log_err("process_insert: Data failed to convert to JSON.")
+        log.log_err("process_insert: Data failed to convert to dictionary")
         status = False
 
     return status

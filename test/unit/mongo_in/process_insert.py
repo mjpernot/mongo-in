@@ -141,6 +141,8 @@ class UnitTest(unittest.TestCase):
         setUp
         test_mongo_failed
         test_mongo_successful
+        test_string_quoted
+        test_dict_string_quoted
         test_json_success
         test_json_failure
         test_with_encoded_data
@@ -168,6 +170,10 @@ class UnitTest(unittest.TestCase):
             base, "test/unit/mongo_in/testfiles/test_process_insert2.json")
         self.in_file3 = os.path.join(
             base, "test/unit/mongo_in/testfiles/test_process_insert3.json")
+        self.in_file4 = os.path.join(
+            base, "test/unit/mongo_in/testfiles/test_process_insert4.json")
+        self.in_file5 = os.path.join(
+            base, "test/unit/mongo_in/testfiles/test_process_insert5.json")
 
     @mock.patch("mongo_in.insert_mongo", mock.Mock(return_value=False))
     def test_mongo_failed(self):
@@ -198,6 +204,36 @@ class UnitTest(unittest.TestCase):
         self.assertTrue(
             mongo_in.process_insert(
                 self.cfg, self.dtg, self.logger, self.in_file))
+
+    @mock.patch("mongo_in.insert_mongo", mock.Mock(return_value=True))
+    def test_string_quoted(self):
+
+        """Function:  test_string_quoted
+
+        Description:  Test with string in a file is string quoted.
+
+        Arguments:
+
+        """
+
+        self.assertFalse(
+            mongo_in.process_insert(
+                self.cfg, self.dtg, self.logger, self.in_file5))
+
+    @mock.patch("mongo_in.insert_mongo", mock.Mock(return_value=True))
+    def test_dict_string_quoted(self):
+
+        """Function:  test_dict_string_quoted
+
+        Description:  Test with dictionary in a file is string quoted.
+
+        Arguments:
+
+        """
+
+        self.assertTrue(
+            mongo_in.process_insert(
+                self.cfg, self.dtg, self.logger, self.in_file4))
 
     @mock.patch("mongo_in.insert_mongo", mock.Mock(return_value=True))
     def test_json_success(self):

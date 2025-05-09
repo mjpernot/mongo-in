@@ -7,6 +7,7 @@
 echo ""
 echo "Unit test:  mongo_in.py"
 /usr/bin/python ./test/unit/mongo_in/check_dirs.py
+/usr/bin/python ./test/unit/mongo_in/data_conversion.py
 /usr/bin/python ./test/unit/mongo_in/help_message.py
 /usr/bin/python ./test/unit/mongo_in/insert_data.py
 /usr/bin/python ./test/unit/mongo_in/insert_mongo.py
