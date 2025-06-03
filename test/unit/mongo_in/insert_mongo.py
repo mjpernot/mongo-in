@@ -16,62 +16,16 @@
 # Standard
 import sys
 import os
-import datetime
 import unittest
 import mock
 
 # Local
 sys.path.append(os.getcwd())
 import mongo_in                                 # pylint:disable=E0401,C0413
+import lib.gen_class as gen_class           # pylint:disable=E0401,C0413,R0402
 import version                                  # pylint:disable=E0401,C0413
 
 __version__ = version.__version__
-
-
-class TimeFormat():                                     # pylint:disable=R0903
-
-    """Class:  TimeFormat
-
-    Description:  Class stub holder for gen_class.TimeFormat class.
-
-    Methods:
-        __init__
-        get_hack
-
-    """
-
-    def __init__(self):
-
-        """Method:  __init__
-
-        Description:  Class initialization.
-
-        Arguments:
-
-        """
-
-        self.delimit = "."
-        self.micro = False
-        self.thacks = {}
-        self.tformats = {
-            "ymd": {"format": "%Y%m%d", "del": "", "micro": False}}
-        rdtg = datetime.datetime.now()
-        ext = ""
-        texpr = "ymd"
-        tformat = "ymd"
-        self.thacks[tformat] = datetime.datetime.strftime(rdtg, texpr) + ext
-
-    def get_hack(self, tformat):
-
-        """Method:  get_hack
-
-        Description:  Stub method holder for TimeFormat.get_hack.
-
-        Arguments:
-
-        """
-
-        return self.thacks[tformat] if tformat in self.thacks else None
 
 
 class Cfg():                                            # pylint:disable=R0903
@@ -180,7 +134,8 @@ class UnitTest(unittest.TestCase):
         """
 
         self.cfg = Cfg()
-        self.dtg = TimeFormat()
+        self.dtg = gen_class.TimeFormat()
+        self.dtg.create_time()
         self.logger = Logger("Name", "Name", "INFO", "%(asctime)s%(message)s",
                              "%m-%d-%YT%H:%M:%SZ|")
         self.data = {"asOf": "20200306 084503", "entry": "data_line"}
