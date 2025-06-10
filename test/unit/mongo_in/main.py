@@ -254,7 +254,7 @@ class UnitTest(unittest.TestCase):
         self.args.args_array = {
             "-c": "config_file", "-d": "config_dir", "-R": True}
         self.args2 = ArgParser()
-        self.args.args_array = {
+        self.args2.args_array = {
             "-c": "config_file", "-d": "config_dir", "-R": True,
             "-y": "Flavor"}
         self.proglock = ProgramLock(["cmdline"], "FlavorID")
