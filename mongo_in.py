@@ -25,7 +25,7 @@ exit 2
         insert into a Mongo database.
 
     Usage:
-        mongo_in.py -c cfg_file -d path -I [-v | -h]
+        mongo_in.py -c cfg_file -d path -I [-y flavor_id] [-v | -h]
 
     Arguments:
         -c cfg_file => Mongo configuration file.
@@ -33,6 +33,7 @@ exit 2
         -I => Insert file with dictionary documents into database.
             -r => Do not archive file, remove file after insert.
 
+        -y value => A flavor id for the program lock.  To create unique lock.
         -v => Display version of this program.
         -h => Help and usage message.
 
@@ -103,8 +104,8 @@ exit 2
                 tls_certkey = None
                 tls_certkey_phrase = None
 
-        Note:  FIPS Environment for Mongo.
-          If operating in a FIPS 104-2 environment, this package will
+        Note:  Secure Environment for Mongo.
+          If operating in a secure environment, this package will
           require at least a minimum of pymongo==3.8.0 or better.  It will
           also require a manual change to the auth.py module in the pymongo
           package.  See below for changes to auth.py.
@@ -192,7 +193,9 @@ def insert_mongo(cfg, dtg, log, data):
         log.log_err("insert_mongo:  Insertion into Mongo failed.")
         log.log_err(f"Mongo error message:  {m_status[1]}")
         fname = os.path.join(
-            cfg.error_dir, "mongo_insert_failed." + dtg.get_hack("ymd"))
+            cfg.error_dir,
+            "InsertFail." + cfg.dbs + "." + cfg.tbl + "." + dtg.get_time("dtg")
+        )
         gen_libs.write_file(fname=fname, mode="a", data=data)
         status = False
 
@@ -386,12 +389,12 @@ def run_program(args, func_dict):
 
     func_dict = dict(func_dict)
     dtg = gen_class.TimeFormat()
-    dtg.create_hack("ymd")
+    dtg.create_time()
     cfg = gen_libs.load_module(args.get_val("-c"), args.get_val("-d"))
     status, err_msg = gen_libs.chk_crt_dir(
         cfg.log_dir, write=True, create=True, no_print=True)
     log_file = os.path.join(
-        cfg.log_dir, cfg.log_file + "." + dtg.get_hack("ymd"))
+        cfg.log_dir, cfg.log_file + "." + dtg.get_time("ymd"))
 
     if status:
         log = gen_class.Logger(
@@ -436,7 +439,7 @@ def main():
     dir_perms_chk = {"-d": 5}
     func_dict = {"-I": insert_data}
     opt_req_list = ["-c", "-d"]
-    opt_val_list = ["-c", "-d"]
+    opt_val_list = ["-c", "-d", "-y"]
 
     # Process argument list from command line
     args = gen_class.ArgParser(sys.argv, opt_val=opt_val_list)

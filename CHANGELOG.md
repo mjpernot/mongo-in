@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on "Keep a Changelog".  This project adheres to Semantic Versioning.
 
 
+## [0.1.2] - 2025-06-03
+- Updated to work with pymongo v4.X
+- Updated mongo-lib to v4.5.2
+
+### Fixed
+- insert_mongo: Replaced get_hack with get_time and changed timeformat to include time and include database and table name as part of the failed insert file name.
+
+### Changed
+- main: Added flavor_id for the program lock.
+- run_program: Replaced create_hack with create_time and get_hack with get_time.
+- Documentation changes.
+
+
 ## [0.1.1] - 2025-05-09
 
 ### Fixed
