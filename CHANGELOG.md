@@ -12,6 +12,7 @@ The format is based on "Keep a Changelog".  This project adheres to Semantic Ver
 - insert_mongo: Replaced get_hack with get_time and changed timeformat to include time and include database and table name as part of the failed insert file name.
 
 ### Changed
+- main: Added flavor_id for the program lock.
 - run_program: Replaced create_hack with create_time and get_hack with get_time.
 - Documentation changes.
 

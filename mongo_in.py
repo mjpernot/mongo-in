@@ -25,7 +25,7 @@ exit 2
         insert into a Mongo database.
 
     Usage:
-        mongo_in.py -c cfg_file -d path -I [-v | -h]
+        mongo_in.py -c cfg_file -d path -I [-y flavor_id] [-v | -h]
 
     Arguments:
         -c cfg_file => Mongo configuration file.
@@ -33,6 +33,7 @@ exit 2
         -I => Insert file with dictionary documents into database.
             -r => Do not archive file, remove file after insert.
 
+        -y value => A flavor id for the program lock.  To create unique lock.
         -v => Display version of this program.
         -h => Help and usage message.
 
@@ -438,7 +439,7 @@ def main():
     dir_perms_chk = {"-d": 5}
     func_dict = {"-I": insert_data}
     opt_req_list = ["-c", "-d"]
-    opt_val_list = ["-c", "-d"]
+    opt_val_list = ["-c", "-d", "-y"]
 
     # Process argument list from command line
     args = gen_class.ArgParser(sys.argv, opt_val=opt_val_list)
