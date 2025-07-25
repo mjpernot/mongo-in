@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on "Keep a Changelog".  This project adheres to Semantic Versioning.
 
 
+## [0.1.3] - 2025-07-25
+- Updated python-lib v4.0.3
+- Updated mongo-lib to v4.5.3
+
+### Fixed:
+- insert_data: Changed file name during move to include an unique DTG format.
+
+### Changed
+- process_insert: Refactored function to process a number of different file formats; dictionary with double quotes, dictionary with single quotes, dictionary with double quotes in a single quote string and dictionary with single quotes in a double quote string.
+
+
 ## [0.1.2] - 2025-06-03
 - Updated to work with pymongo v4.X
 - Updated mongo-lib to v4.5.2
