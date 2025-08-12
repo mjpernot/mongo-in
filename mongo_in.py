@@ -25,12 +25,18 @@ exit 2
         insert into a Mongo database.
 
     Usage:
-        mongo_in.py -c cfg_file -d path -I [-y flavor_id] [-v | -h]
+        mongo_in.py -c cfg_file -d path
+            {-I [-r]}
+            [-y flavor_id] [-v | -h]
 
     Arguments:
         -c cfg_file => Mongo configuration file.
         -d dir path => Config directory path.
-        -I => Insert file with dictionary documents into database.
+
+        -I => Insert file with dictionary document into database, the
+            dictionary can be in expanded or flattened mode.
+            Warning: Cannot have multiple seperate dictionaries in the same
+                file.
             -r => Do not archive file, remove file after insert.
 
         -y value => A flavor id for the program lock.  To create unique lock.

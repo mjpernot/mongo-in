@@ -13,6 +13,7 @@ The format is based on "Keep a Changelog".  This project adheres to Semantic Ver
 
 ### Changed
 - process_insert: Refactored function to process a number of different file formats; dictionary with double quotes, dictionary with single quotes, dictionary with double quotes in a single quote string and dictionary with single quotes in a double quote string.
+- Documentation updates.
 
 
 ## [0.1.2] - 2025-06-03
