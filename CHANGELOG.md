@@ -9,7 +9,7 @@ The format is based on "Keep a Changelog".  This project adheres to Semantic Ver
 - Updated mongo-lib to v4.5.3
 
 ### Fixed:
-- insert_data: Changed file name during move to include an unique DTG format.
+- insert_data: Changed file name during move to include an unique DTG format and fixed file being moved back to the monitored directory instead of archive or error directory.
 
 ### Changed
 - process_insert: Refactored function to process a number of different file formats; dictionary with double quotes, dictionary with single quotes, dictionary with double quotes in a single quote string and dictionary with single quotes in a double quote string.

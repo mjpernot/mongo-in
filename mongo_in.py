@@ -316,14 +316,15 @@ def insert_data(cfg, dtg, log, args):
         cfg.monitor_dir, cfg.file_regex, add_path=True)
     log.log_info("insert_data:  Processing files for insert.")
 
-    for fname in insert_list:
+    for fname_path in insert_list:
+        fname = os.path.basename(fname_path)
         log.log_info(f"insert_data:  Processing file: {fname}")
-        status = process_insert(cfg, dtg, log, fname)
+        status = process_insert(cfg, dtg, log, fname_path)
 
         if status:
             if args.arg_exist("-r"):
                 log.log_info("insert_data:  Removing file.")
-                os.remove(os.path.join(cfg.monitor_dir, fname))
+                os.remove(fname_path)
 
             else:
                 new_fname = fname + "." + dtg.get_time(
@@ -331,9 +332,8 @@ def insert_data(cfg, dtg, log, args):
                 log.log_info(
                     f"insert_data: Moving file to {cfg.archive_dir}/"
                     f"{new_fname}")
-                gen_libs.mv_file(
-                    fname, cfg.monitor_dir, cfg.archive_dir,
-                    new_fname=new_fname)
+                gen_libs.mv_file2(
+                    fname_path, cfg.archive_dir, new_fname=new_fname)
 
         else:
             new_fname = fname + "." + dtg.get_time(
@@ -341,8 +341,7 @@ def insert_data(cfg, dtg, log, args):
             log.log_warn(f"insert_data:  Insert failed for file: {fname}")
             log.log_info(
                 f"insert_data: Moving file to {cfg.error_dir}/{new_fname}")
-            gen_libs.mv_file(
-                fname, cfg.monitor_dir, cfg.error_dir, new_fname=new_fname)
+            gen_libs.mv_file2(fname_path, cfg.error_dir, new_fname=new_fname)
 
             if cfg.to_addr:
                 log.log_warn(

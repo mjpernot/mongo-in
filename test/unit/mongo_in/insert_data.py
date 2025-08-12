@@ -238,7 +238,7 @@ class UnitTest(unittest.TestCase):
         self.assertFalse(
             mongo_in.insert_data(self.cfg, self.dtg, mock_log, self.args))
 
-    @mock.patch("mongo_in.gen_libs.mv_file", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.gen_libs.mv_file2", mock.Mock(return_value=True))
     @mock.patch("mongo_in.process_insert", mock.Mock(return_value=True))
     @mock.patch("mongo_in.gen_libs.filename_search")
     @mock.patch("mongo_in.gen_class.Logger")
@@ -258,7 +258,7 @@ class UnitTest(unittest.TestCase):
         self.assertFalse(
             mongo_in.insert_data(self.cfg, self.dtg, mock_log, self.args))
 
-    @mock.patch("mongo_in.gen_libs.mv_file", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.gen_libs.mv_file2", mock.Mock(return_value=True))
     @mock.patch("mongo_in.process_insert", mock.Mock(return_value=False))
     @mock.patch("mongo_in.gen_class.setup_mail")
     @mock.patch("mongo_in.gen_libs.filename_search")
@@ -280,7 +280,7 @@ class UnitTest(unittest.TestCase):
         self.assertFalse(
             mongo_in.insert_data(self.cfg2, self.dtg, mock_log, self.args))
 
-    @mock.patch("mongo_in.gen_libs.mv_file", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.gen_libs.mv_file2", mock.Mock(return_value=True))
     @mock.patch("mongo_in.process_insert", mock.Mock(return_value=False))
     @mock.patch("mongo_in.gen_class.setup_mail")
     @mock.patch("mongo_in.gen_libs.filename_search")
@@ -302,7 +302,7 @@ class UnitTest(unittest.TestCase):
         self.assertFalse(
             mongo_in.insert_data(self.cfg, self.dtg, mock_log, self.args))
 
-    @mock.patch("mongo_in.gen_libs.mv_file", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.gen_libs.mv_file2", mock.Mock(return_value=True))
     @mock.patch("mongo_in.process_insert", mock.Mock(return_value=True))
     @mock.patch("mongo_in.gen_libs.filename_search")
     @mock.patch("mongo_in.gen_class.Logger")
@@ -322,7 +322,7 @@ class UnitTest(unittest.TestCase):
         self.assertFalse(
             mongo_in.insert_data(self.cfg, self.dtg, mock_log, self.args))
 
-    @mock.patch("mongo_in.gen_libs.mv_file", mock.Mock(return_value=True))
+    @mock.patch("mongo_in.gen_libs.mv_file2", mock.Mock(return_value=True))
     @mock.patch("mongo_in.process_insert", mock.Mock(return_value=True))
     @mock.patch("mongo_in.gen_libs.filename_search")
     @mock.patch("mongo_in.gen_class.Logger")
