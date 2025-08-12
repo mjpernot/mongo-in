@@ -25,12 +25,18 @@ exit 2
         insert into a Mongo database.
 
     Usage:
-        mongo_in.py -c cfg_file -d path -I [-y flavor_id] [-v | -h]
+        mongo_in.py -c cfg_file -d path
+            {-I [-r]}
+            [-y flavor_id] [-v | -h]
 
     Arguments:
         -c cfg_file => Mongo configuration file.
         -d dir path => Config directory path.
-        -I => Insert file with dictionary documents into database.
+
+        -I => Insert file with dictionary document into database, the
+            dictionary can be in expanded or flattened mode.
+            Warning: Cannot have multiple seperate dictionaries in the same
+                file.
             -r => Do not archive file, remove file after insert.
 
         -y value => A flavor id for the program lock.  To create unique lock.
@@ -272,22 +278,17 @@ def process_insert(cfg, dtg, log, fname):
 
     # Check the first 70 chars in case the encoded is split into multiple lines
     if is_base64(data):
-        data_convert = ast.literal_eval(base64.b64decode(data).decode())
+        data = base64.b64decode(data).decode()
 
-    elif not isinstance(data, dict):
-        data_convert = data_conversion(data, log)
+    data = data.replace("\n", "")
+    data = data_conversion(data, log)
 
-    else:
-        data_convert = data
+    # A second data conversion is required in some specific cases
+    if data and not isinstance(data, dict):
+        data = data_conversion(data, log)
 
-    # This is for files that come in with objects that are quoted within the
-    #   file, therefore the object will be required to be converted twice to
-    #   remove the quotes and convert the data
-    if isinstance(data_convert, str):
-        data_convert = data_conversion(data_convert, log)
-
-    if isinstance(data_convert, dict):
-        status = insert_mongo(cfg, dtg, log, data_convert)
+    if data and isinstance(data, dict):
+        status = insert_mongo(cfg, dtg, log, data)
 
     else:
         log.log_err("process_insert: Data failed to convert to dictionary")
@@ -315,22 +316,32 @@ def insert_data(cfg, dtg, log, args):
         cfg.monitor_dir, cfg.file_regex, add_path=True)
     log.log_info("insert_data:  Processing files for insert.")
 
-    for fname in insert_list:
+    for fname_path in insert_list:
+        fname = os.path.basename(fname_path)
         log.log_info(f"insert_data:  Processing file: {fname}")
-        status = process_insert(cfg, dtg, log, fname)
+        status = process_insert(cfg, dtg, log, fname_path)
 
         if status:
             if args.arg_exist("-r"):
                 log.log_info("insert_data:  Removing file.")
-                os.remove(os.path.join(cfg.monitor_dir, fname))
+                os.remove(fname_path)
 
             else:
-                log.log_info("insert_data: Moving file to archive.")
-                gen_libs.mv_file(fname, cfg.monitor_dir, cfg.archive_dir)
+                new_fname = fname + "." + dtg.get_time(
+                    "dtg", micro=True, delimit=".")
+                log.log_info(
+                    f"insert_data: Moving file to {cfg.archive_dir}/"
+                    f"{new_fname}")
+                gen_libs.mv_file2(
+                    fname_path, cfg.archive_dir, new_fname=new_fname)
 
         else:
+            new_fname = fname + "." + dtg.get_time(
+                "dtg", micro=True, delimit=".")
             log.log_warn(f"insert_data:  Insert failed for file: {fname}")
-            gen_libs.mv_file(fname, cfg.monitor_dir, cfg.error_dir)
+            log.log_info(
+                f"insert_data: Moving file to {cfg.error_dir}/{new_fname}")
+            gen_libs.mv_file2(fname_path, cfg.error_dir, new_fname=new_fname)
 
             if cfg.to_addr:
                 log.log_warn(
