@@ -38,7 +38,7 @@ class Logger():                                         # pylint:disable=R0903
 
     """
 
-    def __init__(                                       # pylint:disable=R0913
+    def __init__(                               # pylint:disable=R0913,R0917
             self, job_name, job_log, log_type, log_format, log_time):
 
         """Method:  __init__
